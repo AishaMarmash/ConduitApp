@@ -1,0 +1,7 @@
+*.vs
+*.user
+*.dll
+*.pdb
+*.cache
+Conduit/bin/
+Conduit/obj/
