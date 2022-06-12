@@ -14,5 +14,6 @@ namespace Conduit.Domain.Models
         public string? Password { get; set; }
         public string? Bio { get; set; }
         public string? Image { get; set; }
+        public List<Article> Articles { get; set; }
     }
 }

@@ -9,11 +9,11 @@ using Microsoft.IdentityModel;
 
 namespace Conduit.Data
 {
-    public class UserContext : DbContext
+    public class AppContext : DbContext
     {
-        public UserContext()
+        public AppContext()
         { }
-        public UserContext(DbContextOptions options) : base(options)
+        public AppContext(DbContextOptions options) : base(options)
         {
             
         }
@@ -26,8 +26,9 @@ namespace Conduit.Data
         }
 
         public DbSet<User> Users { get; set; }
-        
-        //public DbSet<Profile> Profiles { get; set; }
+        public DbSet<Article> Articles { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             /*base.OnModelCreating(builder);

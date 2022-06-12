@@ -14,7 +14,7 @@ namespace Conduit.Controllers
     [ApiController]
     public class userController : Controller
     {
-        UserContext userContext;
+        Data.AppContext userContext;
         private IConfiguration _config;
         UserRepository userRepo;
         private readonly IMapper _mapper;
@@ -41,28 +41,6 @@ namespace Conduit.Controllers
             userResponse.Token = token;
             return Ok(userResponse);
         }
-        //[Authorize]
-        //[HttpPatch]
-        //public ActionResult user([FromBody]JsonPatchDocument<UserForUpdateDto>patchDocument)
-        //{
-        //    if (patchDocument == null)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    var token = GetCurrentAsync();
-        //    var tokenn = new JwtSecurityTokenHandler().ReadJwtToken(token);
-        //    var claim = tokenn.Claims.First(c => c.Type == "email").Value;
-        //    var userFromRepo = userRepo.Find(claim);
-        //    if (userFromRepo == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var userToPatch = _mapper.Map<UserForUpdateDto>(userFromRepo);
-        //    patchDocument.ApplyTo(userToPatch);
-        //    _mapper.Map(userToPatch, userFromRepo);
-        //    userRepo.UpdateUser(claim, userFromRepo);
-        //    return NoContent();
-        //}
         [Authorize]
         [HttpPut]
         public ActionResult Updateuser(UserForUpdateDto userForUpdateDto)

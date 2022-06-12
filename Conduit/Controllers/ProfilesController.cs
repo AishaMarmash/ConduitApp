@@ -10,7 +10,7 @@ namespace Conduit.Controllers
     [Route("api/Profiles")]
     public class ProfilesController : Controller
     {
-        UserContext _userContext;
+        Data.AppContext _userContext;
         ProfileRepository profileRepo;
         private readonly IMapper _mapper;
 

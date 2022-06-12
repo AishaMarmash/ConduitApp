@@ -9,9 +9,9 @@ namespace Conduit.Data.Repositories
 {
     public class ProfileRepository
     {
-        protected readonly UserContext _context;
+        protected readonly AppContext _context;
 
-        public ProfileRepository(UserContext context)
+        public ProfileRepository(AppContext context)
         {
             _context = context;
         }

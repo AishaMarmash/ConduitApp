@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Conduit.Data.Migrations
 {
-    [DbContext(typeof(UserContext))]
+    [DbContext(typeof(AppContext))]
     [Migration("20220611103734_CreateUsersTable")]
     partial class CreateUsersTable
     {

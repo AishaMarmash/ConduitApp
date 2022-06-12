@@ -17,7 +17,7 @@ builder.Services.AddControllers()
 // Learn more about configuring Swagger/OpenAPI at //https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<UserContext>(options =>
+builder.Services.AddDbContext<Conduit.Data.AppContext>(options =>
 {
     options.UseSqlServer("Data Source=DESKTOP-ICHCNJM\\SQLEXPRESS;Initial Catalog = ConduitData;Integrated Security=True");
 });

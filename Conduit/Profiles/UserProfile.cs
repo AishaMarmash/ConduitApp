@@ -10,6 +10,7 @@ namespace Conduit.Profiles
             CreateMap<User, UserForResponse>();
             CreateMap<User, UserForUpdateDto>();
             CreateMap<UserForUpdateDto, User>();
+            CreateMap<User, ProfileForResponse>();
         }
     }
 }

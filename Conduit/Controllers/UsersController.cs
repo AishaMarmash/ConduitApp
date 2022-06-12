@@ -15,7 +15,7 @@ namespace Conduit.Controllers
     [ApiController]
     public class UsersController : Controller
     {
-        UserContext userContext;
+        Data.AppContext userContext;
         private IConfiguration _config;
         UserRepository userRepo;
         private readonly IMapper _mapper;
