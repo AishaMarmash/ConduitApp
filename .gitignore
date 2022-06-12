@@ -3,5 +3,5 @@
 *.dll
 *.pdb
 *.cache
-Conduit/bin/
-Conduit/obj/
+**/bin/*
+**/obj/*
