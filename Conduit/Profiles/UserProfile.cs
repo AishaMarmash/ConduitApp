@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using Conduit.Domain.Models;
+using Conduit.Domain.Entities;
+using Conduit.Domain.ViewModels;
 
 namespace Conduit.Profiles
 {
@@ -7,6 +8,8 @@ namespace Conduit.Profiles
     {
         public UserProfile()
         {
+            CreateMap<LoginUserDto, User>();
+            CreateMap<RegisterUserDto, User>();
             CreateMap<User, UserForResponse>();
             CreateMap<User, UserForUpdateDto>();
             CreateMap<UserForUpdateDto, User>();

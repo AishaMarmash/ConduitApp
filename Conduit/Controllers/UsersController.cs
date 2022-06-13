@@ -1,106 +1,62 @@
-﻿using Conduit.Data;
-using Conduit.Data.Repositories;
-using Conduit.Domain.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Conduit.Services;
-using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
-using Microsoft.Extensions.Primitives;
-using System.IdentityModel.Tokens.Jwt;
+using Conduit.Domain.Entities;
+using Conduit.Domain.ViewModels;
+using Conduit.Domain.Services;
 
 namespace Conduit.Controllers
 {
-    [Route("api/Users")]
+    [Route("api/users")]
     [ApiController]
     public class UsersController : Controller
     {
-        Data.AppContext userContext;
-        private IConfiguration _config;
-        UserRepository userRepo;
+        private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UsersController(IConfiguration config, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public UsersController(IUserService userService, IMapper mapper, IJwtService jwtService)
         {
-            userContext = new();
-            _config = config;
-            userRepo = new UserRepository(userContext);
-            _config = config;
+            _userService = userService;
             _mapper = mapper;
-            _httpContextAccessor = httpContextAccessor;
+            _jwtService = jwtService;
         }
         [HttpPost]
-        public IActionResult Index([FromBody] RegisterModel registerModel)
+        public IActionResult Register([FromBody] RegisterModel registerModel)
         {
-            if (registerModel.Username.Length == 0)
+            if (_userService.UserExist(registerModel.User.Email))
             {
-                throw new Exception("Username Field is required");
+                return Conflict("user already exist");
             }
-            if (registerModel.email.Length == 0)
-            {
-                throw new Exception("Email Field is required");
-            }
-            if (registerModel.Password.Length == 0)
-            {
-                throw new Exception("Password Field is required");
-            }
-            if (userRepo.UserExist(registerModel.email))
-            {
-                throw new Exception("user is exist");
-            }
-            var user = new User()
-            {
-                Username = registerModel.Username,
-                Password = registerModel.Password,
-                Email = registerModel.email
-            };
-            userRepo.Add(user);
+            User user = _mapper.Map<User>(registerModel.User);
+            _userService.Add(user);
             var userResponse = _mapper.Map<UserForResponse>(user);
-            var token = GetToken(user.Email);
-            userResponse.Token = token;
-            return Ok(userResponse);
+            userResponse.Token = _jwtService.ExtractToken(registerModel.User.Email);
+            UserResponse response = new();
+            response.user = userResponse;
+            return Ok(response);
         }
+
         [HttpPost("login")]
-        public ActionResult<UserForResponse> login([FromBody] LoginModel loginModel)
+        public IActionResult login([FromBody] LoginModel loginModel)
         {
-            if (loginModel.Email.Length == 0)
+            if (!_userService.UserExist(loginModel.User.Email))
             {
-                throw new Exception("Email Field is required");
+                return NotFound("user is not exist");
             }
-            if (loginModel.Password.Length == 0)
-            {
-                throw new Exception("Password Field is required");
-            }
-            if (!userRepo.UserExist(loginModel.Email))
-            {
-                throw new Exception("user is not exist");
-            }
-            User user = new User()
-            {
-                Email = loginModel.Email,
-                Password = loginModel.Password
-            };
-            var result = userRepo.Find(user);
+            var user = _mapper.Map<User>(loginModel.User);
+            var result = _userService.Find(user);
             if (result == null)
             {
                 throw new Exception("Password is uncorrect");
             }
-            
             else
             {
                 UserForResponse userResponse = _mapper.Map<UserForResponse>(result);
-                var token = GetToken(user.Email);
-                userResponse.Token = token;
-                return Ok(userResponse);
+                userResponse.Token = _jwtService.ExtractToken(loginModel.User.Email);
+                UserResponse response = new();
+                response.user = userResponse;
+                return Ok(response);
             }
-        }
-        [NonAction]
-        public string GetToken(string email)
-        {
-            var jwt = new JwtService(_config);
-            var token = jwt.GenerateSecurityToken(email);
-            return token;
         }
     }
 }

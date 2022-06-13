@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using Conduit.Data;
 using Conduit.Data.Repositories;
-using Conduit.Domain.Models;
+using Conduit.Domain.Entities;
 using Conduit.Domain.Services;
+using Conduit.Domain.ViewModels;
 using Conduit.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

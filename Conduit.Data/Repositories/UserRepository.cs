@@ -1,24 +1,16 @@
-﻿using Conduit.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Conduit.Domain.Entities;
+using Conduit.Domain.Repositories;
+using Conduit.Domain.ViewModels;
 
 namespace Conduit.Data.Repositories
 {
-    public class UserRepository
+    public class UserRepository : IUserRepository
     {
         protected readonly AppContext _context;
 
         public UserRepository(AppContext context)
         {
             _context = context;
-        }
-
-        public IEnumerable<User> ListMethod()
-        {
-            return _context.Users.ToList();
         }
         public void Add(User user)
         {

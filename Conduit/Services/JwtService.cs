@@ -1,21 +1,22 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.Extensions.Configuration;
+using Conduit.Domain.Services;
 
 namespace Conduit.Services
 {
-    public class JwtService
+    public class JwtService : IJwtService
     {
         private readonly string _secret;
         private readonly string _expDate;
+        private static IConfiguration _config;
 
         public JwtService(IConfiguration config)
         {
             _secret = config.GetSection("JwtConfig").GetSection("secret").Value;
             _expDate = config.GetSection("JwtConfig").GetSection("expirationInMinutes").Value;
+            _config = config;
         }
 
         public string GenerateSecurityToken(string email)
@@ -34,6 +35,12 @@ namespace Conduit.Services
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+        public string ExtractToken(string email)
+        {
+            var jwt = new JwtService(_config);
+            var token = jwt.GenerateSecurityToken(email);
+            return token;
         }
     }
 }

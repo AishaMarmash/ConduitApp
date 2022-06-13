@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Conduit.Domain.Models
+namespace Conduit.Domain.Entities
 {
     public class Article
     {

@@ -1,11 +1,5 @@
-﻿using Conduit.Domain.Models;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.IdentityModel;
+﻿using Microsoft.EntityFrameworkCore;
+using Conduit.Domain.Entities;
 
 namespace Conduit.Data
 {

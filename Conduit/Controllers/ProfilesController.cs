@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Conduit.Data;
 using Conduit.Data.Repositories;
-using Conduit.Domain.Models;
+using Conduit.Domain.Entities;
+using Conduit.Domain.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Conduit.Controllers

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using Conduit.Domain.Models;
-using Conduit.Sercices;
+using Conduit.Domain.Entities;
+using Conduit.Domain.ViewModels;
+using Conduit.Services;
 
 namespace Conduit.Profiles
 {

@@ -4,16 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Conduit.Domain.Models
+namespace Conduit.Domain.ViewModels
 {
-    public class User
+    public class UserForResponse
     {
-        public int Id { get; set; }
-        public string? Username { get; set; }
         public string? Email { get; set; }
-        public string? Password { get; set; }
+        public string? Token { get; set; }
+        public string? Username { get; set; }
         public string? Bio { get; set; }
         public string? Image { get; set; }
-        public List<Article> Articles { get; set; }
     }
 }

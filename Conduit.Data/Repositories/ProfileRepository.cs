@@ -1,4 +1,4 @@
-﻿using Conduit.Domain.Models;
+﻿using Conduit.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
