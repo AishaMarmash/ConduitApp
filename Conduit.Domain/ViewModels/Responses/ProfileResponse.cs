@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Conduit.Domain.ViewModels
 {
-    public class UserResponse
+    public class ProfileResponse
     {
-        [JsonPropertyName("user")]
-        public UserResponseDto User { get; set; }
+        [JsonPropertyName("profile")]
+        public ProfileResponseDto Profile { get; set; }
     }
 }

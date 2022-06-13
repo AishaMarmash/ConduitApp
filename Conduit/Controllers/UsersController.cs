@@ -10,11 +10,11 @@ namespace Conduit.Controllers
     [ApiController]
     public class UsersController : Controller
     {
-        private readonly IUserService _userService;
+        private readonly IUsersService _userService;
         private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public UsersController(IUserService userService, IMapper mapper, IJwtService jwtService)
+        public UsersController(IUsersService userService, IMapper mapper, IJwtService jwtService)
         {
             _userService = userService;
             _mapper = mapper;
@@ -29,10 +29,9 @@ namespace Conduit.Controllers
             }
             User user = _mapper.Map<User>(registerModel.User);
             _userService.Add(user);
-            var userResponse = _mapper.Map<UserForResponse>(user);
-            userResponse.Token = _jwtService.ExtractToken(registerModel.User.Email);
-            UserResponse response = new();
-            response.user = userResponse;
+            
+            var token = _jwtService.GenerateSecurityToken(registerModel.User.Email);
+            var response = _userService.PrepareUserResponse(user, token);
             return Ok(response);
         }
 
@@ -43,18 +42,16 @@ namespace Conduit.Controllers
             {
                 return NotFound("user is not exist");
             }
-            var user = _mapper.Map<User>(loginModel.User);
-            var result = _userService.Find(user);
-            if (result == null)
+            var userFromRequest = _mapper.Map<User>(loginModel.User);
+            var userFromRepo = _userService.FindUser(userFromRequest);
+            if (userFromRepo == null)
             {
-                throw new Exception("Password is uncorrect");
+                return Forbid("Password is wrong");
             }
             else
             {
-                UserForResponse userResponse = _mapper.Map<UserForResponse>(result);
-                userResponse.Token = _jwtService.ExtractToken(loginModel.User.Email);
-                UserResponse response = new();
-                response.user = userResponse;
+                var token = _jwtService.GenerateSecurityToken(loginModel.User.Email);
+                var response = _userService.PrepareUserResponse(userFromRepo, token);
                 return Ok(response);
             }
         }

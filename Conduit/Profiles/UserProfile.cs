@@ -10,10 +10,11 @@ namespace Conduit.Profiles
         {
             CreateMap<LoginUserDto, User>();
             CreateMap<RegisterUserDto, User>();
-            CreateMap<User, UserForResponse>();
-            CreateMap<User, UserForUpdateDto>();
-            CreateMap<UserForUpdateDto, User>();
-            CreateMap<User, ProfileForResponse>();
+            CreateMap<User, UserResponseDto>();
+            CreateMap<User, UpdateUserDto>();
+            CreateMap<UpdateUserDto, User>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<User, ProfileResponseDto>();
         }
     }
 }

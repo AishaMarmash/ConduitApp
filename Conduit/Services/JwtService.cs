@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Conduit.Domain.Services;
+using Microsoft.Extensions.Primitives;
 
 namespace Conduit.Services
 {
@@ -21,6 +22,7 @@ namespace Conduit.Services
 
         public string GenerateSecurityToken(string email)
         {
+            var jwt = new JwtService(_config);
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_secret);
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -36,11 +38,22 @@ namespace Conduit.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-        public string ExtractToken(string email)
+        public string GetCurrentAsync()
         {
-            var jwt = new JwtService(_config);
-            var token = jwt.GenerateSecurityToken(email);
-            return token;
+            HttpContextAccessor httpContextAccessor = new();
+            var authorizationHeader = httpContextAccessor.HttpContext.Request.Headers["authorization"];
+            return authorizationHeader == StringValues.Empty
+                ? string.Empty
+                : authorizationHeader.Single().Split(" ").Last();
+        }
+        //unused
+        public string GetEmailClaim()
+        {
+            var tokenString = GetCurrentAsync();
+            var tokenJwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
+            var emailClaim = tokenJwt.Claims.First(c => c.Type == "email").Value;
+            return emailClaim;
+
         }
     }
 }

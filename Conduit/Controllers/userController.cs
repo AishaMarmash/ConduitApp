@@ -1,69 +1,53 @@
 ﻿using AutoMapper;
-using Conduit.Data;
-using Conduit.Data.Repositories;
+using Conduit.Domain.Entities;
+using Conduit.Domain.Services;
 using Conduit.Domain.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Conduit.Controllers
 {
     [Route("api/user")]
     [ApiController]
-    public class userController : Controller
+    [Authorize]
+    public class UserController : Controller
     {
-        Data.AppContext userContext;
-        private IConfiguration _config;
-        UserRepository userRepo;
+        private readonly IUsersService _userService;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public userController(IConfiguration config, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public UserController(IUsersService userService, IMapper mapper, IJwtService jwtService)
         {
-            userContext = new();
-            _config = config;
-            userRepo = new UserRepository(userContext);
-            _config = config;
+            _userService = userService;
             _mapper = mapper;
-            _httpContextAccessor = httpContextAccessor;
+            _jwtService = jwtService;
         }
-        [Authorize]
         [HttpGet]
-        public ActionResult Index()
+        public ActionResult GetCurrentUser()
         {
-            var token = GetCurrentAsync();
-            var tokenn = new JwtSecurityTokenHandler().ReadJwtToken(token);
-            var claim = tokenn.Claims.First(c => c.Type == "email").Value;
-            var result = userRepo.Find(claim);
-            UserForResponse userResponse = _mapper.Map<UserForResponse>(result);
-            userResponse.Token = token;
-            return Ok(userResponse);
-        }
-        [Authorize]
-        [HttpPut]
-        public ActionResult Updateuser(UserForUpdateDto userForUpdateDto)
-        {
-            var token = GetCurrentAsync();
-            var tokenn = new JwtSecurityTokenHandler().ReadJwtToken(token);
-            var claim = tokenn.Claims.First(c => c.Type == "email").Value;
-            var userFromRepo = userRepo.Find(claim);
-            if (userFromRepo == null)
-            {
-                return NotFound();
-            }
-            userRepo.UpdateUser(userFromRepo, userForUpdateDto);
-            return NoContent();
-        }
-        [NonAction]
-        private string GetCurrentAsync()
-        {
-            var authorizationHeader = _httpContextAccessor.HttpContext.Request.Headers["authorization"];
+            var tokenString = _jwtService.GetCurrentAsync();
+            var tokenJwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
+            var emailClaim = tokenJwt.Claims.First(c => c.Type == "email").Value;
+            
+            var userFromRep = _userService.FindByEmail(emailClaim);
 
-            return authorizationHeader == StringValues.Empty
-                ? string.Empty
-                : authorizationHeader.Single().Split(" ").Last();
+            var response = _userService.PrepareUserResponse(userFromRep, tokenString);
+            return Ok(response);
+        }
+        [HttpPut]
+        public ActionResult Updateuser([FromBody] UpdateModel updateModel)
+        {
+            var tokenString = _jwtService.GetCurrentAsync();
+            var tokenJwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
+            var claim = tokenJwt.Claims.First(c => c.Type == "email").Value;
+
+            var userFromRep = _userService.FindByEmail(claim);
+            _mapper.Map(updateModel.User, userFromRep);
+            _userService.UpdateUser(userFromRep);
+            
+            var response = _userService.PrepareUserResponse(userFromRep, tokenString);
+            return Ok(response);
         }
     }
 }

@@ -1,14 +1,14 @@
 ﻿using Conduit.Domain.Entities;
 using Conduit.Domain.ViewModels;
-
-namespace Conduit.Domain.Repositories
+namespace Conduit.Domain.Services
 {
-    public interface IUserRepository
+    public interface IUsersService
     {
         public void Add(User user);
         public User? FindUser(User user);
         public User? FindByEmail(string email);
         public bool UserExist(string email);
         public void UpdateUser(User updateduser);
+        public UserResponse PrepareUserResponse(User user , string token);
     }
 }
