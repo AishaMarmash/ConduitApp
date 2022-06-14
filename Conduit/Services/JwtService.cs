@@ -19,7 +19,6 @@ namespace Conduit.Services
             _expDate = config.GetSection("JwtConfig").GetSection("expirationInMinutes").Value;
             _config = config;
         }
-
         public string GenerateSecurityToken(string email)
         {
             var jwt = new JwtService(_config);
@@ -34,7 +33,6 @@ namespace Conduit.Services
                 Expires = DateTime.UtcNow.AddMinutes(double.Parse(_expDate)),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
-
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
@@ -46,13 +44,12 @@ namespace Conduit.Services
                 ? string.Empty
                 : authorizationHeader.Single().Split(" ").Last();
         }
-        //unused
         public string GetEmailClaim()
         {
             var tokenString = GetCurrentAsync();
             var tokenJwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
-            var emailClaim = tokenJwt.Claims.First(c => c.Type == "email").Value;
-            return emailClaim;
+            var email = tokenJwt.Claims.First(c => c.Type == "email").Value;
+            return email;
         }
     }
 }

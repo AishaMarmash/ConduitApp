@@ -12,7 +12,6 @@ namespace Conduit.Domain.ViewModels.RequestBody
         public string Title { get; set; }
         public string Description { get; set; }
         public string Body { get; set; }
-        [JsonPropertyName("tagList")]
-        public List<string> Tags { get; set; }
+        public List<string>? TagList { get; set; } = new();
     }
 }

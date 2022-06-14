@@ -4,6 +4,7 @@ using Conduit.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Conduit.Data.Migrations
 {
     [DbContext(typeof(AppContext))]
-    partial class UserContextModelSnapshot : ModelSnapshot
+    [Migration("20220614170508_UsersFavoriteArticlesMig")]
+    partial class UsersFavoriteArticlesMig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,39 +88,6 @@ namespace Conduit.Data.Migrations
                     b.ToTable("Articles");
                 });
 
-            modelBuilder.Entity("Conduit.Domain.Entities.Comment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("ArticleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Body")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ArticleId");
-
-                    b.HasIndex("AuthorId");
-
-                    b.ToTable("Comments");
-                });
-
             modelBuilder.Entity("Conduit.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -188,25 +157,6 @@ namespace Conduit.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Conduit.Domain.Entities.Comment", b =>
-                {
-                    b.HasOne("Conduit.Domain.Entities.Article", "Article")
-                        .WithMany("Comments")
-                        .HasForeignKey("ArticleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Conduit.Domain.Entities.User", "Author")
-                        .WithMany("Comments")
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Article");
-
-                    b.Navigation("Author");
-                });
-
             modelBuilder.Entity("UserUser", b =>
                 {
                     b.HasOne("Conduit.Domain.Entities.User", null)
@@ -222,16 +172,9 @@ namespace Conduit.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Conduit.Domain.Entities.Article", b =>
-                {
-                    b.Navigation("Comments");
-                });
-
             modelBuilder.Entity("Conduit.Domain.Entities.User", b =>
                 {
                     b.Navigation("Articles");
-
-                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }

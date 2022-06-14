@@ -13,7 +13,6 @@ namespace Conduit.Domain.Entities
         public DateTime UpdatedAt { get; set; }
         public string Body { get; set; }
         public User Author { get; set; }
-
-
+        public Article Article { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using Conduit.Domain.Entities;
 using Conduit.Domain.Repositories;
 using Conduit.Domain.Services;
+using Conduit.Domain.ViewModels;
 using Conduit.Domain.ViewModels.RequestBody;
 
 namespace Conduit.Services
@@ -59,6 +60,45 @@ namespace Conduit.Services
         {
             var articles = _articleRepository.ListArticlesByAuthor(authorName,limit,offset);
             return articles;
+        }
+        public List<Article> ListArticlesByFavorited(string favorited, int limit, int offset)
+        {
+            var articles = _articleRepository.ListArticlesByFavorited(favorited, limit, offset);
+            return articles;
+        }
+
+        public List<Article> FeedArticles(User currentUser, int limit, int offset)
+        {
+            var articles = _articleRepository.FeedArticles(currentUser, limit, offset);
+            return articles;
+        }
+
+        public void FavoriteArticle(User currentUser, Article favoritedArticle)
+        {
+            _articleRepository.FavoriteArticle(currentUser, favoritedArticle);
+        }
+        public void UnFavoriteArticle(User currentUser, Article unFavoritedArticle)
+        {
+            _articleRepository.UnFavoriteArticle(currentUser, unFavoritedArticle);
+        }
+        public Comment AddComment(string slug, Comment comment, User currentUser)
+        {
+            return _articleRepository.AddComment(slug, comment, currentUser);
+        }
+
+        public List<Comment> GetComments(string slug)
+        {
+            return _articleRepository.GetComments(slug);
+        }
+
+        public void DeleteComment(Comment comment)
+        {
+            _articleRepository.DeleteComment(comment);
+        }
+
+        public List<string> GetTags()
+        {
+            return _articleRepository.GetTags();
         }
     }
 }

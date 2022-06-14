@@ -21,12 +21,12 @@ namespace Conduit.Services
         public static string Combine(this List<string> tagsList)
         {
             string result="";
-            foreach(var tag in tagsList)
-            {
-                result += tag + ",";
-            }
-            result.Remove(result.Length - 1);
-            return result;
+            //tagsList.Aggregate((a, b) => a + "," + b);
+            //foreach(var tag in tagsList)
+            //{
+            //    result += tag + ",";
+            //}
+            return result= tagsList.Aggregate((a, b) => a + "," + b);//.TrimEnd(','); ;
         }
 
         public static string GenerateSlug(this string phrase)

@@ -15,9 +15,11 @@ namespace Conduit.Domain.Entities
         public string? Bio { get; set; }
         public string? Image { get; set; }
         public List<Article> Articles { get; set; } = new List<Article>();
-        //public List<FollowingUsers> FollowingUsers { get; set; } = new List<FollowingUsers>();
+        public List<Article> FavoritedArticles { get; set; } = new List<Article>();
+
         public List<User> Followings { get; set; } = new List<User>();
         public List<User> Followers { get; set; } = new List<User>();
+        public List<Comment> Comments { get; set; } = new List<Comment>();
 
     }
 }

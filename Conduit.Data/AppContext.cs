@@ -20,28 +20,33 @@ namespace Conduit.Data
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            //builder.Entity<User>()
-            //    .HasMany(u => u.Articles)
-            //    .WithOne();
+            builder
+            .Entity<User>()
+            .HasMany(u => u.Articles)
+            .WithOne(u => u.User);
+            
+            //many to many
+            builder
+            .Entity<User>()
+            .HasMany(u => u.FavoritedArticles)
+            .WithMany(u => u.FavoritesUsers)
+            .UsingEntity(j => j.ToTable("UsersFavoriteArticles"));
 
-            //builder.Entity<FollowingUsers>()
-            //    .HasKey(u => new { u.UserId, u.FollowingUserId });
+            //one to many
+            builder
+           .Entity<Article>()
+           .HasMany(u => u.Comments)
+           .WithOne(u => u.Article);
 
-            //builder.Entity<FollowingUsers>()
-            //    .HasOne(fu => fu.User)
-            //    .WithMany(u => u.FollowingUsers)
-            //    .HasForeignKey(fu => fu.UserId);
+            builder
+           .Entity<User>()
+           .HasMany(u => u.Comments)
+           .WithOne(u => u.Author);
 
-            //builder.Entity<FollowingUsers>()
-            //    .HasOne(fu => fu.User)
-            //    .WithMany(u => u.FollowingUsers)
-            //    .HasForeignKey(fu => fu.FollowingUserId);
-                
         }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Article> Articles { get; set; }
-
-
+        public DbSet<Comment> Comments { get; set; }
     }
 }
