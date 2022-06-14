@@ -27,6 +27,11 @@ namespace Conduit.Data.Repositories
             var result = _context.Users.FirstOrDefault(m => (m.Email == email));
             return result;
         }
+        public User? FindByUsername(string username)
+        {
+            var result = _context.Users.FirstOrDefault(m => (m.Username == username));
+            return result;
+        }
         public bool UserExist(string email)
         {
             var result = _context.Users.FirstOrDefault(m => (m.Email == email));
@@ -38,17 +43,6 @@ namespace Conduit.Data.Repositories
 
         public void UpdateUser(User updateduser)
         {
-            //_context.Users.SingleOrDefault(m => (m.Email == userToUpdateo.Email));
-            //if (userToUpdateo.Username!=null)
-            //    userFromRepo.Username = userToUpdateo.Username;
-            //if (userToUpdateo.Email != null)
-            //    userFromRepo.Email = userToUpdateo.Email;
-            //if (userToUpdateo.Password != null)
-            //    userFromRepo.Password = userToUpdateo.Password;
-            //if (userToUpdateo.Bio != null)
-            //    userFromRepo.Bio = userToUpdateo.Bio;
-            //_context.Users.Update(updateduser);
-            //_context.Entry(updateduser);
             _context.SaveChanges();
         }
     }

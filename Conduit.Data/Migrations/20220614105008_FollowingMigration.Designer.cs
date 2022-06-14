@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Conduit.Data.Migrations
 {
     [DbContext(typeof(AppContext))]
-    [Migration("20220612183536_CreateArticlesTable")]
-    partial class CreateArticlesTable
+    [Migration("20220614105008_FollowingMigration")]
+    partial class FollowingMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,7 +24,7 @@ namespace Conduit.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Conduit.Domain.Models.Article", b =>
+            modelBuilder.Entity("Conduit.Domain.Entities.Article", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -63,7 +63,7 @@ namespace Conduit.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -73,7 +73,7 @@ namespace Conduit.Data.Migrations
                     b.ToTable("Articles");
                 });
 
-            modelBuilder.Entity("Conduit.Domain.Models.User", b =>
+            modelBuilder.Entity("Conduit.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -101,14 +101,48 @@ namespace Conduit.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Conduit.Domain.Models.Article", b =>
+            modelBuilder.Entity("UserUser", b =>
                 {
-                    b.HasOne("Conduit.Domain.Models.User", null)
-                        .WithMany("Articles")
-                        .HasForeignKey("UserId");
+                    b.Property<int>("FollowersId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FollowingsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("FollowersId", "FollowingsId");
+
+                    b.HasIndex("FollowingsId");
+
+                    b.ToTable("UserUser");
                 });
 
-            modelBuilder.Entity("Conduit.Domain.Models.User", b =>
+            modelBuilder.Entity("Conduit.Domain.Entities.Article", b =>
+                {
+                    b.HasOne("Conduit.Domain.Entities.User", "User")
+                        .WithMany("Articles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("UserUser", b =>
+                {
+                    b.HasOne("Conduit.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("FollowersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Conduit.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("FollowingsId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Conduit.Domain.Entities.User", b =>
                 {
                     b.Navigation("Articles");
                 });

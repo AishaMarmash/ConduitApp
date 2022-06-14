@@ -6,5 +6,7 @@ namespace Conduit.Domain.Services
     {
         public User GetProfile(string username);
         public ProfileResponse PrepareProfileResponse(User user);
+        public User FollowUser(User userFollwer, User followingUser);
+        public User UnFollowUser(User userFollwer, User followingUser);
     }
 }

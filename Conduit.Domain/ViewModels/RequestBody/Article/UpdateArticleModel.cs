@@ -5,11 +5,11 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Conduit.Domain.ViewModels
+namespace Conduit.Domain.ViewModels.RequestBody
 {
-    public class RegisterModel
+    public class UpdateArticleModel
     {
-        [JsonPropertyName("user")]
-        public RegisterUserDto User { get; set; }
+        [JsonPropertyName("article")]
+        public UpdateArticleDto Article;
     }
 }

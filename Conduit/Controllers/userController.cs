@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Conduit.Domain.Entities;
 using Conduit.Domain.Services;
-using Conduit.Domain.ViewModels;
+using Conduit.Domain.ViewModels.RequestBody;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;

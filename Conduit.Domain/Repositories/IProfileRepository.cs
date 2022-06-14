@@ -10,5 +10,8 @@ namespace Conduit.Domain.Repositories
     public interface IProfileRepository
     {
         public User GetProfile(string username);
+        public User FollowUser(User userFollwer, User followingUser);
+        public User UnFollowUser(User userFollwer, User followingUser);
+
     }
 }

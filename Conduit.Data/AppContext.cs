@@ -18,19 +18,30 @@ namespace Conduit.Data
                 options.UseSqlServer(@"Data Source=DESKTOP-ICHCNJM\SQLEXPRESS;Initial Catalog = ConduitData;Integrated Security=True");
             }
         }
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            //builder.Entity<User>()
+            //    .HasMany(u => u.Articles)
+            //    .WithOne();
+
+            //builder.Entity<FollowingUsers>()
+            //    .HasKey(u => new { u.UserId, u.FollowingUserId });
+
+            //builder.Entity<FollowingUsers>()
+            //    .HasOne(fu => fu.User)
+            //    .WithMany(u => u.FollowingUsers)
+            //    .HasForeignKey(fu => fu.UserId);
+
+            //builder.Entity<FollowingUsers>()
+            //    .HasOne(fu => fu.User)
+            //    .WithMany(u => u.FollowingUsers)
+            //    .HasForeignKey(fu => fu.FollowingUserId);
+                
+        }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Article> Articles { get; set; }
 
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            /*base.OnModelCreating(builder);
-            builder.Entity<User>()
-            .HasOne<Profile>(p=>p.Id)
-            .WithOne(u => u.User)
-            .HasForeignKey(p => p.CategoryId);*/
-
-        }
     }
 }

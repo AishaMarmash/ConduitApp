@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Conduit.Domain.Entities;
 using Conduit.Domain.ViewModels;
+using Conduit.Domain.ViewModels.RequestBody;
 
 namespace Conduit.Profiles
 {
@@ -15,6 +16,8 @@ namespace Conduit.Profiles
             CreateMap<UpdateUserDto, User>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<User, ProfileResponseDto>();
+            CreateMap<User, User>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }

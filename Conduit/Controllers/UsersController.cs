@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Conduit.Domain.Entities;
-using Conduit.Domain.ViewModels;
 using Conduit.Domain.Services;
+using Conduit.Domain.ViewModels.RequestBody;
 
 namespace Conduit.Controllers
 {

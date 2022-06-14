@@ -1,10 +1,6 @@
 ﻿using AutoMapper;
-using Conduit.Data;
-using Conduit.Data.Repositories;
-using Conduit.Domain.Entities;
 using Conduit.Domain.Services;
-using Conduit.Domain.ViewModels;
-using Conduit.Services;
+using Conduit.Domain.ViewModels.RequestBody;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,54 +10,71 @@ namespace Conduit.Controllers
     [ApiController]
     public class ArticlesController : Controller
     {
-        Data.AppContext articleContext;
-        private IConfiguration _config;
-        ArticleRepository articleRepo;
+        private readonly IArticleService _articleService;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public ArticlesController(IConfiguration config, IMapper mapper)
+        public ArticlesController(IArticleService articleService, IMapper mapper, IJwtService jwtService)
         {
-            articleContext = new();
-            _config = config;
-            articleRepo = new ArticleRepository(articleContext);
-            _config = config;
+            _articleService = articleService;
             _mapper = mapper;
+            _jwtService = jwtService;
         }
         [Authorize]
         [HttpPost]
-        public ActionResult CreateArticle(ArticleForCreate article)
+        public ActionResult CreateArticle([FromBody]CreateArticleModel CreateArticleModel)
         {
-            var articleToSave = _mapper.Map<Article>(article);
-            articleToSave.Slug = articleToSave.Title.GenerateSlug();
-            articleToSave.Favorited = false;
-            articleToSave.FavoritesCount = 0;
-            articleToSave.CreatedAt = articleToSave.UpdatedAt = DateTime.Now;
-            articleRepo.Add(articleToSave);
-            return Ok(articleToSave);
+            string authorEmail = _jwtService.GetEmailClaim();
+            var newArticle = _articleService.PrepareArticleToSave(CreateArticleModel.Article);
+            _articleService.Add(newArticle, authorEmail);
+            return Ok(newArticle);
         }
 
         [HttpGet("{slug}")]
         public ActionResult ReadArticle(string slug)
         {
-            var article = articleRepo.Find(slug);
+            var article = _articleService.Find(slug);
             return Ok(article);
         }
         [Authorize]
         [HttpDelete("{slug}")]
         public ActionResult DeleteArticle(string slug)
         {
-            var article = articleRepo.Find(slug);
-            articleRepo.Delete(article);
+            string authorEmail = _jwtService.GetEmailClaim();
+            _articleService.Delete(slug,authorEmail);
             return Ok();
         }
-
-        [NonAction]
-        public string GetToken(string email)
+        [Authorize]
+        [HttpPut("{slug}")]
+        public ActionResult UpdateArticle(string slug,[FromBody] UpdateArticleModel updateArticleModel )
         {
-            var jwt = new JwtService(_config);
-            var token = jwt.GenerateSecurityToken(email);
-            return token;
-        }
+            var articleFromRepo = _articleService.Find(slug);
+            _mapper.Map(updateArticleModel.Article,articleFromRepo);
+            string authorEmail = _jwtService.GetEmailClaim();
 
+            _articleService.Update(articleFromRepo, authorEmail);
+            return Ok();
+        }
+        
+        [HttpGet]
+        public ActionResult ListArticles([FromQuery] string? tag = null , [FromQuery] string? author = null, [FromQuery] int limit = 20, [FromQuery] int offset = 0)
+        {
+            if(tag != null)
+            {
+                var articles = _articleService.ListArticlesByTag(tag,limit,offset);
+                return Ok(articles);
+            }
+            if(author != null)
+            {
+                var articles = _articleService.ListArticlesByAuthor(author, limit, offset);
+                return Ok(articles);
+            }
+            else
+            {
+                var articles = _articleService.ListArticles(limit, offset);
+                return Ok(articles);
+            }
+            return NotFound();
+        }
     }
 }

@@ -19,5 +19,6 @@ namespace Conduit.Domain.Entities
         public DateTime UpdatedAt { get; set; }
         public bool Favorited { get; set; }
         public int FavoritesCount { get; set; }
+        public User User { get; set; } = new();
     }
 }

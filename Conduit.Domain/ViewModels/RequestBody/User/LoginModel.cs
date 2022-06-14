@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Conduit.Domain.ViewModels
+namespace Conduit.Domain.ViewModels.RequestBody
 {
     public class LoginModel
     {

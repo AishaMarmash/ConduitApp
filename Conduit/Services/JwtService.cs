@@ -53,7 +53,6 @@ namespace Conduit.Services
             var tokenJwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
             var emailClaim = tokenJwt.Claims.First(c => c.Type == "email").Value;
             return emailClaim;
-
         }
     }
 }

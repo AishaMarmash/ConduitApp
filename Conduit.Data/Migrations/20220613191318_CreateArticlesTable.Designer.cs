@@ -4,6 +4,7 @@ using Conduit.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Conduit.Data.Migrations
 {
     [DbContext(typeof(AppContext))]
-    partial class UserContextModelSnapshot : ModelSnapshot
+    [Migration("20220613191318_CreateArticlesTable")]
+    partial class CreateArticlesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,21 +101,6 @@ namespace Conduit.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("UserUser", b =>
-                {
-                    b.Property<int>("FollowersId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FollowingsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("FollowersId", "FollowingsId");
-
-                    b.HasIndex("FollowingsId");
-
-                    b.ToTable("UserUser");
-                });
-
             modelBuilder.Entity("Conduit.Domain.Entities.Article", b =>
                 {
                     b.HasOne("Conduit.Domain.Entities.User", "User")
@@ -123,21 +110,6 @@ namespace Conduit.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("UserUser", b =>
-                {
-                    b.HasOne("Conduit.Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("FollowersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Conduit.Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("FollowingsId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Conduit.Domain.Entities.User", b =>

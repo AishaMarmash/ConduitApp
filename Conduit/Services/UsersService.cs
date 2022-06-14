@@ -30,7 +30,10 @@ namespace Conduit.Services
         {
             return _userRepository.FindByEmail(email);
         }
-
+        public User? FindByUsername(string username)
+        {
+            return _userRepository.FindByUsername(username);
+        }
         public void UpdateUser(User updateduser)
         {
             _userRepository.UpdateUser(updateduser);

@@ -20,6 +20,15 @@ namespace Conduit.Services
         {
             return _profileRepository.GetProfile(username);
         }
+        public User FollowUser(User follower, User followingUser)
+        {
+            return _profileRepository.FollowUser(follower,followingUser);
+        }
+        public User UnFollowUser(User follower, User followingUser)
+        {
+            return _profileRepository.UnFollowUser(follower, followingUser);
+        }
+
         public ProfileResponse PrepareProfileResponse(User user)
         {
             ProfileResponseDto profile = _mapper.Map<ProfileResponseDto>(user);

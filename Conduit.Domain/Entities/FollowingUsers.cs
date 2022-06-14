@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Conduit.Domain.Entities
 {
-    public class UserFollowing
+    public class FollowingUsers
     {
         public int UserId { get; set; }
-        public User Usesr { get; set; }
-        public int FollowingId { get; set; }
-        public User Followings { get; set; }
+        public int FollowingUserId { get; set; }
+        public User User { get; set; }
+        public User FollowingUser { get; set; }
     }
 }
