@@ -3,7 +3,7 @@ namespace Conduit.Domain.Repositories
 {
     public interface IArticleRepository
     {
-        public void Add(Article article, string authorEmail);
+        public Article Add(Article article, string authorEmail);
         public Article Find(string slug);
         public void Delete(string slug, string authorEmail);
         void Update(Article articleToSave, string authorEmail);

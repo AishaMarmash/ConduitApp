@@ -9,9 +9,9 @@ namespace Conduit.Domain.Repositories
 {
     public interface IProfileRepository
     {
-        public User GetProfile(string username);
-        public User FollowUser(User userFollwer, User followingUser);
-        public User UnFollowUser(User userFollwer, User followingUser);
-
+        public User? GetProfile(string username);
+        public void FollowUser(User userFollwer, User followingUser);
+        public void UnFollowUser(User userFollwer, User followingUser);
+        public bool FollowingStatus(User userFollwer, User followingUser);
     }
 }

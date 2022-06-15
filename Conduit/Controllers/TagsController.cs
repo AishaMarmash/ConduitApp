@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using Conduit.Domain.Services;
+﻿using Conduit.Domain.Services;
+using Conduit.Domain.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Conduit.Controllers
@@ -9,21 +9,17 @@ namespace Conduit.Controllers
     public class TagsController:Controller
     {
         private readonly IArticleService _articleService;
-        private readonly IJwtService _jwtService;
-        private readonly IMapper _mapper;
 
-        public TagsController(IArticleService articleService, IMapper mapper, IJwtService jwtService)
+        public TagsController(IArticleService articleService)
         {
             _articleService = articleService;
-            _mapper = mapper;
-            _jwtService = jwtService;
         }
         [HttpGet]
         public IActionResult GetTags()
         {
-            var response = _articleService.GetTags();
+            var result = _articleService.GetTags();
+            var response = new TagsResponse(result);
             return Ok(response);
         }
-
     }
 }

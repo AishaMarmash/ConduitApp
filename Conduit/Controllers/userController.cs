@@ -28,9 +28,9 @@ namespace Conduit.Controllers
         {
             var tokenString = _jwtService.GetCurrentAsync();
             var tokenJwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
-            var emailClaim = tokenJwt.Claims.First(c => c.Type == "email").Value;
+            var userEmail = tokenJwt.Claims.First(c => c.Type == "email").Value;
             
-            var userFromRep = _userService.FindByEmail(emailClaim);
+            var userFromRep = _userService.FindByEmail(userEmail);
 
             var response = _userService.PrepareUserResponse(userFromRep, tokenString);
             return Ok(response);
@@ -40,9 +40,9 @@ namespace Conduit.Controllers
         {
             var tokenString = _jwtService.GetCurrentAsync();
             var tokenJwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
-            var claim = tokenJwt.Claims.First(c => c.Type == "email").Value;
+            var userEmail = tokenJwt.Claims.First(c => c.Type == "email").Value;
 
-            var userFromRep = _userService.FindByEmail(claim);
+            var userFromRep = _userService.FindByEmail(userEmail);
             _mapper.Map(updateModel.User, userFromRep);
             _userService.UpdateUser(userFromRep);
             

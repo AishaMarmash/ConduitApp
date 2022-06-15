@@ -36,7 +36,7 @@ namespace Conduit.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult login([FromBody] LoginModel loginModel)
+        public IActionResult Login([FromBody] LoginModel loginModel)
         {
             if (!_userService.UserExist(loginModel.User.Email))
             {

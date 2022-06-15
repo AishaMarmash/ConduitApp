@@ -12,24 +12,25 @@ namespace Conduit.Data.Repositories
             _context = context;
         }
 
-        public User GetProfile(string username)
+        public User? GetProfile(string username)
         {
             var result = _context.Users.FirstOrDefault(m => (m.Username == username));
             return result;
         }
-        public User FollowUser(User userFollwer, User followingUser)
+        public void FollowUser(User userFollwer, User followingUser)
         {
-            _context.Users.FirstOrDefault(u => u.Id == userFollwer.Id).Followings.Add(followingUser);
+            _context.Users.First(u => u.Id == userFollwer.Id).Followings.Add(followingUser);
             _context.SaveChanges();
-            User result= new User();
-            return result;
         }
-        public User UnFollowUser(User userFollwer, User followingUser)
+        public void UnFollowUser(User userFollwer, User followingUser)
         {
-            var result2 = _context.Users.Include(u=>u.Followings).FirstOrDefault(u => u.Id == userFollwer.Id).Followings.Remove(followingUser);
+            _context.Users.Include(u=>u.Followings).First(u => u.Id == userFollwer.Id).Followings.Remove(followingUser);
             _context.SaveChanges();
-            User result = new User();
-            return result;
+        }
+        public bool FollowingStatus(User userFollwer, User followingUser)
+        {
+            bool followingStatus = _context.Users.Include(u => u.Followings).First(u => u.Id == userFollwer.Id).Followings.Any(f => f.Id == followingUser.Id);
+            return followingStatus;
         }
     }
 }

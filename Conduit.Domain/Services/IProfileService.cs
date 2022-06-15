@@ -4,9 +4,10 @@ namespace Conduit.Domain.Services
 {
     public interface IProfileService
     {
-        public User GetProfile(string username);
+        public User? GetProfile(string username);
         public ProfileResponse PrepareProfileResponse(User user);
-        public User FollowUser(User userFollwer, User followingUser);
-        public User UnFollowUser(User userFollwer, User followingUser);
+        public void FollowUser(User userFollwer, User followingUser);
+        public void UnFollowUser(User userFollwer, User followingUser);
+        public bool FollowingStatus(User userFollwer, User followingUser);
     }
 }

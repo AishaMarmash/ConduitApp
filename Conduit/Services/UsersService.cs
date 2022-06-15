@@ -3,18 +3,21 @@ using Conduit.Domain.Entities;
 using Conduit.Domain.Repositories;
 using Conduit.Domain.Services;
 using Conduit.Domain.ViewModels;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Conduit.Services
 {
     public class UsersService : IUsersService
     {
         private readonly IUserRepository _userRepository;
+        private IJwtService _jwtService;
         private IMapper _mapper;
 
-        public UsersService(IUserRepository userRepository, IMapper mapper)
+        public UsersService(IUserRepository userRepository, IMapper mapper, IJwtService jwtService)
         {
             _userRepository = userRepository;
             _mapper = mapper;
+            _jwtService = jwtService;   
         }
         public void Add(User user)
         {
@@ -52,5 +55,14 @@ namespace Conduit.Services
             response.User.Token = token;
             return response;
         }
+
+        public string GetCurrentUserEmail()
+        {
+            var tokenString = _jwtService.GetCurrentAsync();
+            var tokenJwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
+            var userEmail = tokenJwt.Claims.First(c => c.Type == "email").Value;
+            return userEmail;
+        }
+
     }
 }

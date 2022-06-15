@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Conduit.Domain.ViewModels.RequestBody
+namespace Conduit.Domain.ViewModels
 {
     public class UpdateArticleModel
     {

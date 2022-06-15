@@ -9,9 +9,9 @@ namespace Conduit.Domain.Entities
     public class User
     {
         public int Id { get; set; }
-        public string? Username { get; set; }
-        public string? Email { get; set; }
-        public string? Password { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
         public string? Bio { get; set; }
         public string? Image { get; set; }
         public List<Article> Articles { get; set; } = new List<Article>();

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Conduit.Domain.Entities;
 using Conduit.Domain.ViewModels;
-using Conduit.Domain.ViewModels.RequestBody;
 using Conduit.Services;
 
 namespace Conduit.Profiles
@@ -11,9 +10,11 @@ namespace Conduit.Profiles
         public ArticleProfile()
         {
             CreateMap<CreateArticleDto, Article>()
-                .ForMember(
-                dest => dest.TagList,
-                opt => opt.MapFrom(src => (src.TagList != null && src.TagList.Count()!=0) ? src.TagList.Combine(): null));
+                .ForMember(dest => dest.CreatedAt,
+                 opt => opt.MapFrom(src => DateTime.Now))
+                .ForMember(dest => dest.UpdatedAt,
+                 opt => opt.MapFrom(src => DateTime.Now));
+            
             CreateMap<UpdateArticleDto, Article>()
                  .ForMember(
                  dest => dest.Slug,
@@ -21,12 +22,21 @@ namespace Conduit.Profiles
                  .ForMember(dest => dest.UpdatedAt,
                  opt => opt.MapFrom(src => DateTime.Now))
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+            
             CreateMap<CommentDto, Comment>()
                 .ForMember(dest => dest.UpdatedAt,
                  opt => opt.MapFrom(src => DateTime.Now))
                 .ForMember(dest => dest.CreatedAt,
                  opt => opt.MapFrom(src => DateTime.Now))
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
+            CreateMap<Article, ArticleResponseDto>()
+                 .ForMember(
+                 dest => dest.TagList,
+                 opt => opt.MapFrom(src => (src.TagList != null) ?(src.TagList.MoveToList()): null));
+            CreateMap<CreateArticleDto, Article>();
+
+
         }
     }
 }

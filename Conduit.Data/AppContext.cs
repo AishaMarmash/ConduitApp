@@ -25,14 +25,12 @@ namespace Conduit.Data
             .HasMany(u => u.Articles)
             .WithOne(u => u.User);
             
-            //many to many
             builder
             .Entity<User>()
             .HasMany(u => u.FavoritedArticles)
             .WithMany(u => u.FavoritesUsers)
             .UsingEntity(j => j.ToTable("UsersFavoriteArticles"));
 
-            //one to many
             builder
            .Entity<Article>()
            .HasMany(u => u.Comments)
@@ -42,7 +40,6 @@ namespace Conduit.Data
            .Entity<User>()
            .HasMany(u => u.Comments)
            .WithOne(u => u.Author);
-
         }
 
         public DbSet<User> Users { get; set; }

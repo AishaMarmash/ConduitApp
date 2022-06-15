@@ -3,6 +3,7 @@ using Conduit.Domain.Entities;
 using Conduit.Domain.Services;
 using Conduit.Domain.ViewModels;
 using Conduit.Domain.ViewModels.RequestBody;
+using Conduit.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -25,6 +26,7 @@ namespace Conduit.Controllers
             _jwtService = jwtService;
             _usersService = usersService;
         }
+
         [Authorize]
         [HttpPost]
         public ActionResult CreateArticle([FromBody] CreateArticleModel recievedModel)
@@ -32,9 +34,11 @@ namespace Conduit.Controllers
             CreateArticleDto recievedArticle = recievedModel.Article;
             string authorEmail = _jwtService.GetEmailClaim();
             var newArticle = _articleService.PrepareArticleToSave(recievedArticle);
-            _articleService.Add(newArticle, authorEmail);
-            return Ok(newArticle);
+            Article a = _articleService.Add(newArticle, authorEmail);
+            var response = _articleService.PrepareArticleResponse(a);
+            return Ok(response);
         }
+
         [Authorize]
         [HttpPut("{slug}")]
         public ActionResult UpdateArticle(string slug, [FromBody] UpdateArticleModel recievedModel)
@@ -53,7 +57,8 @@ namespace Conduit.Controllers
         public ActionResult ReadArticle(string slug)
         {
             var article = _articleService.Find(slug);
-            return Ok(article);
+            var newArticle = _articleService.PrepareArticleResponse(article);
+            return Ok(newArticle);
         }
         [Authorize]
         [HttpDelete("{slug}")]
@@ -70,33 +75,46 @@ namespace Conduit.Controllers
             if (tag != null)
             {
                 var articles = _articleService.ListArticlesByTag(tag, limit, offset);
-                return Ok(articles);
+                var articlesListResponse = BuildResponse(articles);
+                return Ok(articlesListResponse);
             }
             if (author != null)
             {
                 var articles = _articleService.ListArticlesByAuthor(author, limit, offset);
-                return Ok(articles);
+                var articlesListResponse = BuildResponse(articles);
+                return Ok(articlesListResponse);
             }
             if (favorited != null)
             {
                 var articles = _articleService.ListArticlesByFavorited(favorited, limit, offset);
-                return Ok(articles);
+                var articlesListResponse = BuildResponse(articles);
+                return Ok(articlesListResponse);
             }
             else
             {
                 var articles = _articleService.ListArticles(limit, offset);
-                return Ok(articles);
+                var articlesListResponse = BuildResponse(articles);
+                return Ok(articlesListResponse);
             }
-            return NotFound();
+        }
+        [NonAction]
+        public List<ArticleResponseDto> BuildResponse(List<Article> articles)
+        {
+            List<ArticleResponseDto> articlesListResponse = new();
+            foreach (var article in articles)
+            {
+                var mappedArticle = _mapper.Map<ArticleResponseDto>(article);
+                mappedArticle.Author = _mapper.Map<ProfileResponseDto>(article.User);
+                articlesListResponse.Add(mappedArticle);
+            }
+            return articlesListResponse;
         }
         [HttpGet("feed")]
         [Authorize]
         public ActionResult FeedArticles([FromQuery] int limit = 20, [FromQuery] int offset = 0)
         {
-            var tokenString = _jwtService.GetCurrentAsync();
-            var tokenJwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
-            var emailClaim = tokenJwt.Claims.First(c => c.Type == "email").Value;
-            var currentUser = _usersService.FindByEmail(emailClaim);
+            var currentUserEmail = _usersService.GetCurrentUserEmail();
+            var currentUser = _usersService.FindByEmail(currentUserEmail);
 
             var articles = _articleService.FeedArticles(currentUser, limit, offset);
             return Ok(articles);
@@ -105,10 +123,8 @@ namespace Conduit.Controllers
         [Authorize]
         public IActionResult FavoriteArticle(string slug)
         {
-            var tokenString = _jwtService.GetCurrentAsync();
-            var tokenJwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
-            var emailClaim = tokenJwt.Claims.First(c => c.Type == "email").Value;
-            var currentUser = _usersService.FindByEmail(emailClaim);
+            var currentUserEmail = _usersService.GetCurrentUserEmail();
+            var currentUser = _usersService.FindByEmail(currentUserEmail);
             var favoritedArticle = _articleService.Find(slug);
             _articleService.FavoriteArticle(currentUser, favoritedArticle);
             return Ok(favoritedArticle);
@@ -117,10 +133,8 @@ namespace Conduit.Controllers
         [Authorize]
         public IActionResult UnFavoriteArticle(string slug)
         {
-            var tokenString = _jwtService.GetCurrentAsync();
-            var tokenJwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
-            var emailClaim = tokenJwt.Claims.First(c => c.Type == "email").Value;
-            var currentUser = _usersService.FindByEmail(emailClaim);
+            var currentUserEmail = _usersService.GetCurrentUserEmail();
+            var currentUser = _usersService.FindByEmail(currentUserEmail);
             var unFavoritedArticle = _articleService.Find(slug);
             _articleService.UnFavoriteArticle(currentUser, unFavoritedArticle);
             return Ok(unFavoritedArticle);
@@ -129,10 +143,8 @@ namespace Conduit.Controllers
         [Authorize]
         public IActionResult AddComment(string slug, [FromBody] CommentModel recievedModel)
         {
-            var tokenString = _jwtService.GetCurrentAsync();
-            var tokenJwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
-            var emailClaim = tokenJwt.Claims.First(c => c.Type == "email").Value;
-            var currentUser = _usersService.FindByEmail(emailClaim);
+            var currentUserEmail = _usersService.GetCurrentUserEmail();
+            var currentUser = _usersService.FindByEmail(currentUserEmail);
             var comment = recievedModel.Comment;
             var comentToSend = _mapper.Map<Comment>(comment);
             comentToSend.CreatedAt = comentToSend.UpdatedAt = DateTime.UtcNow;

@@ -11,5 +11,6 @@ namespace Conduit.Domain.Services
         public bool UserExist(string email);
         public void UpdateUser(User updateduser);
         public UserResponse PrepareUserResponse(User user , string token);
+        public string GetCurrentUserEmail();
     }
 }

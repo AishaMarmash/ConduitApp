@@ -16,19 +16,18 @@ namespace Conduit.Services
             _profileRepository = profileRepository;
             _mapper = mapper;
         }
-        public User GetProfile(string username)
+        public User? GetProfile(string username)
         {
             return _profileRepository.GetProfile(username);
         }
-        public User FollowUser(User follower, User followingUser)
+        public void FollowUser(User follower, User followingUser)
         {
-            return _profileRepository.FollowUser(follower,followingUser);
+            _profileRepository.FollowUser(follower,followingUser);
         }
-        public User UnFollowUser(User follower, User followingUser)
+        public void UnFollowUser(User follower, User followingUser)
         {
-            return _profileRepository.UnFollowUser(follower, followingUser);
+            _profileRepository.UnFollowUser(follower, followingUser);
         }
-
         public ProfileResponse PrepareProfileResponse(User user)
         {
             ProfileResponseDto profile = _mapper.Map<ProfileResponseDto>(user);
@@ -36,6 +35,9 @@ namespace Conduit.Services
             response.Profile = profile;
             return response;
         }
-
+        public bool FollowingStatus(User userFollwer, User followingUser)
+        {
+            return _profileRepository.FollowingStatus(userFollwer,followingUser);
+        }
     }
 }
