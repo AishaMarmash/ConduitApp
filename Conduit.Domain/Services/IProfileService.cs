@@ -5,9 +5,11 @@ namespace Conduit.Domain.Services
     public interface IProfileService
     {
         public User? GetProfile(string username);
-        public ProfileResponse PrepareProfileResponse(User user);
         public void FollowUser(User userFollwer, User followingUser);
         public void UnFollowUser(User userFollwer, User followingUser);
-        public bool FollowingStatus(User userFollwer, User followingUser);
+        public ProfileResponse PrepareProfileResponse(User user);
+        public bool GetFollowingStatus(User userFollwer, User followingUser);
+        public ProfileResponse ApplyFollowingStatus(ProfileResponse response);
+        public ProfileResponse GetFollowingActivityResponse(User currentUser, User neededUser);
     }
 }

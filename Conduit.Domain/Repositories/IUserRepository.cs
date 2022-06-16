@@ -7,9 +7,9 @@ namespace Conduit.Domain.Repositories
     {
         public void RegisterUser(User user);
         public User? LoginUser(User user);
-        public User? FindByEmail(string email);
+        public User? GetUserByEmail(string email);
         public User? FindByUsername(string username);
         public bool UserExist(string? email = null, string? username = null);
-        public void UpdateUser(User updateduser);
+        public void SaveChanges();
     }
 }

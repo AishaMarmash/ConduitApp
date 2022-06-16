@@ -6,11 +6,12 @@ namespace Conduit.Domain.Services
     {
         public void RegisterUser(User user);
         public User? LoginUser(User user);
-        public User? FindByEmail(string email);
-        public User? FindByUsername(string username);
+        public User? GetUserByEmail(string email);
+        public User? GetUserByName(string username);
         public bool UserExist(string? email = null, string? username = null);
-        public void UpdateUser(User updateduser);
+        public void SaveUserChanges();
         public UserResponse PrepareUserResponse(User user , string token);
         public string GetCurrentUserEmail();
+        public bool CheckAuthentication();
     }
 }

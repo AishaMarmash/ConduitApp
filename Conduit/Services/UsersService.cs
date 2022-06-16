@@ -23,30 +23,26 @@ namespace Conduit.Services
         {
             _userRepository.RegisterUser(user);
         }
-
         public User? LoginUser(User user)
         {
             return _userRepository.LoginUser(user);
         }
-
-        public User? FindByEmail(string email)
+        public User? GetUserByEmail(string email)
         {
-            return _userRepository.FindByEmail(email);
+            return _userRepository.GetUserByEmail(email);
         }
-        public User? FindByUsername(string username)
+        public User? GetUserByName(string username)
         {
             return _userRepository.FindByUsername(username);
         }
-        public void UpdateUser(User updateduser)
+        public void SaveUserChanges()
         {
-            _userRepository.UpdateUser(updateduser);
+            _userRepository.SaveChanges();
         }
-
         public bool UserExist(string? email = null, string? username = null)
         {
             return _userRepository.UserExist(email, username);
         }
-
         public UserResponse PrepareUserResponse(User user, string token)
         {
             UserResponseDto userResponse = _mapper.Map<UserResponseDto>(user);
@@ -55,7 +51,6 @@ namespace Conduit.Services
             response.User.Token = token;
             return response;
         }
-
         public string GetCurrentUserEmail()
         {
             var tokenString = _jwtService.GetCurrentAsync();
@@ -63,6 +58,17 @@ namespace Conduit.Services
             var userEmail = tokenJwt.Claims.First(c => c.Type == "email").Value;
             return userEmail;
         }
-
+        public bool CheckAuthentication()
+        {
+            var tokenString = _jwtService.GetCurrentAsync();
+            if (string.IsNullOrEmpty(tokenString))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }

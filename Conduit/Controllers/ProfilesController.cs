@@ -1,9 +1,6 @@
-﻿using Conduit.Domain.Entities;
-using Conduit.Domain.Services;
-using Conduit.Domain.ViewModels;
+﻿using Conduit.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace Conduit.Controllers
 {
@@ -13,17 +10,14 @@ namespace Conduit.Controllers
     {
         private readonly IProfileService _profileService;
         private readonly IUsersService _usersService;
-        private readonly IJwtService _jwtService;
 
-        public ProfilesController(IProfileService profileService,IJwtService jwtService, IUsersService usersService)
+        public ProfilesController(IProfileService profileService, IUsersService usersService)
         {
             _profileService = profileService;
-            _jwtService = jwtService;
             _usersService = usersService;
         }
-
         [HttpGet("{username}")]
-        public ActionResult GetProfiles(string username)
+        public ActionResult GetProfile(string username)
         {
             var user = _profileService.GetProfile(username);
             if (user == null)
@@ -33,13 +27,10 @@ namespace Conduit.Controllers
             else
             {
                 var response = _profileService.PrepareProfileResponse(user);
-                var tokenString = _jwtService.GetCurrentAsync();
-                if (!string.IsNullOrEmpty(tokenString))
+                bool isAuthenticated = _usersService.CheckAuthentication();
+                if (isAuthenticated)
                 {
-                    var userEmail = _usersService.GetCurrentUserEmail();
-                    var currentUser = _usersService.FindByEmail(userEmail);
-                    var otherUser = _usersService.FindByUsername(username);
-                    response.Profile.Following = _profileService.FollowingStatus(currentUser, otherUser);
+                    response = _profileService.ApplyFollowingStatus(response);
                 }
                 return Ok(response);
             }
@@ -50,8 +41,8 @@ namespace Conduit.Controllers
         public IActionResult FollowUser(string username)
         {
             var userEmail = _usersService.GetCurrentUserEmail();
-            var currentUser = _usersService.FindByEmail(userEmail);
-            var followedUser = _usersService.FindByUsername(username);
+            var currentUser = _usersService.GetUserByEmail(userEmail);
+            var followedUser = _usersService.GetUserByName(username);
             if(followedUser==null)
             {
                 return NotFound("user not found to follow");
@@ -59,7 +50,7 @@ namespace Conduit.Controllers
             else if(currentUser!=null)
             {
                 _profileService.FollowUser(currentUser, followedUser);
-                var response = GetFollowingActivityResponse(currentUser, followedUser);
+                var response = _profileService.GetFollowingActivityResponse(currentUser, followedUser);
                 return Ok(response);
             }
             return Unauthorized();
@@ -70,8 +61,8 @@ namespace Conduit.Controllers
         public IActionResult UnFollowUser(string username)
         {
             var userEmail = _usersService.GetCurrentUserEmail();
-            var currentUser = _usersService.FindByEmail(userEmail);
-            var unFollowedUser = _usersService.FindByUsername(username);
+            var currentUser = _usersService.GetUserByEmail(userEmail);
+            var unFollowedUser = _usersService.GetUserByName(username);
             if (unFollowedUser == null)
             {
                 return NotFound("user not found to unfollow");
@@ -79,19 +70,10 @@ namespace Conduit.Controllers
             else if(currentUser!=null)
             {
                 _profileService.UnFollowUser(currentUser, unFollowedUser);
-                var response = GetFollowingActivityResponse(currentUser, unFollowedUser);
+                var response = _profileService.GetFollowingActivityResponse(currentUser, unFollowedUser);
                 return Ok(response);
             }
             return Unauthorized();
         }
-        [NonAction]
-        public ProfileResponse GetFollowingActivityResponse(User currentUser,User neededUser)
-        {
-            var user = _profileService.GetProfile(neededUser.Username);
-            var response = _profileService.PrepareProfileResponse(user);
-            response.Profile.Following = _profileService.FollowingStatus(currentUser, neededUser);
-            return response;
-        }
-
     }
 }

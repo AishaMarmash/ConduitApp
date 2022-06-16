@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Conduit.Domain.Entities;
 using Conduit.Domain.Services;
 using Conduit.Domain.ViewModels.RequestBody;
 using Microsoft.AspNetCore.Authorization;
@@ -30,10 +29,13 @@ namespace Conduit.Controllers
             var tokenJwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
             var userEmail = tokenJwt.Claims.First(c => c.Type == "email").Value;
             
-            var userFromRep = _userService.FindByEmail(userEmail);
-
-            var response = _userService.PrepareUserResponse(userFromRep, tokenString);
-            return Ok(response);
+            var userFromRep = _userService.GetUserByEmail(userEmail);
+            if(userFromRep != null)
+            {
+                var response = _userService.PrepareUserResponse(userFromRep, tokenString);
+                return Ok(response);
+            }
+            else { return NotFound("user does not exist"); }
         }
         [HttpPut]
         public ActionResult Updateuser([FromBody] UpdateModel updateModel)
@@ -42,9 +44,9 @@ namespace Conduit.Controllers
             var tokenJwt = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
             var userEmail = tokenJwt.Claims.First(c => c.Type == "email").Value;
 
-            var userFromRep = _userService.FindByEmail(userEmail);
+            var userFromRep = _userService.GetUserByEmail(userEmail);
             _mapper.Map(updateModel.User, userFromRep);
-            _userService.UpdateUser(userFromRep);
+            _userService.SaveUserChanges();
             
             var response = _userService.PrepareUserResponse(userFromRep, tokenString);
             return Ok(response);

@@ -38,7 +38,6 @@ namespace Conduit.Controllers
             var response = _userService.PrepareUserResponse(user, token);
             return Ok(response);
         }
-
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginModel loginModel)
         {
