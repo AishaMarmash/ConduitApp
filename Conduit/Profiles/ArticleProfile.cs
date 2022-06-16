@@ -33,7 +33,7 @@ namespace Conduit.Profiles
             CreateMap<Article, ArticleResponseDto>()
                  .ForMember(
                  dest => dest.TagList,
-                 opt => opt.MapFrom(src => (src.TagList != null) ?(src.TagList.MoveToList()): null));
+                 opt => opt.MapFrom(src => (!String.IsNullOrEmpty(src.TagList)) ?(src.TagList.MoveToList()): null));
             CreateMap<CreateArticleDto, Article>();
 
 

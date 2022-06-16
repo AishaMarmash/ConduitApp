@@ -113,7 +113,7 @@ namespace Conduit.Data.Repositories
             List<string> result = new();
             foreach(var Tags in TagsList)
             {
-                if(Tags != null)
+                if(!String.IsNullOrEmpty(Tags))
                 result.AddRange(Tags.Split(",").ToList());
             }
             return result.Distinct().ToList();

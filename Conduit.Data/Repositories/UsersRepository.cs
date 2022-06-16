@@ -12,12 +12,12 @@ namespace Conduit.Data.Repositories
         {
             _context = context;
         }
-        public void Add(User user)
+        public void RegisterUser(User user)
         {
             _context.Users.Add(user);
             _context.SaveChanges();
         }
-        public User? FindUser(User user)
+        public User? LoginUser(User user)
         {
             var result  = _context.Users.FirstOrDefault(m=>(m.Email == user.Email) && (m.Password == user.Password));
             return result;
@@ -32,15 +32,14 @@ namespace Conduit.Data.Repositories
             var result = _context.Users.FirstOrDefault(m => (m.Username == username));
             return result;
         }
-        public bool UserExist(string email)
+        public bool UserExist(string? email = null, string? username = null)
         {
-            var result = _context.Users.FirstOrDefault(m => (m.Email == email));
+            var result = _context.Users.FirstOrDefault(user => (user.Email == email)||(user.Username == username));
             if (result == null)
                 return false;
             else
                 return true;
         }
-
         public void UpdateUser(User updateduser)
         {
             _context.SaveChanges();

@@ -51,7 +51,9 @@ namespace Conduit.Controllers
             {
                 _articleService.Update(articleFromRepo, userEmail);
             }
-            return Ok();
+            ArticleResponse response = new();
+            response.Article = _mapper.Map<ArticleResponseDto>(articleFromRepo);
+            return Ok(response);
         }
         [HttpGet("{slug}")]
         public ActionResult ReadArticle(string slug)
@@ -97,18 +99,6 @@ namespace Conduit.Controllers
                 return Ok(articlesListResponse);
             }
         }
-        [NonAction]
-        public List<ArticleResponseDto> BuildResponse(List<Article> articles)
-        {
-            List<ArticleResponseDto> articlesListResponse = new();
-            foreach (var article in articles)
-            {
-                var mappedArticle = _mapper.Map<ArticleResponseDto>(article);
-                mappedArticle.Author = _mapper.Map<ProfileResponseDto>(article.User);
-                articlesListResponse.Add(mappedArticle);
-            }
-            return articlesListResponse;
-        }
         [HttpGet("feed")]
         [Authorize]
         public ActionResult FeedArticles([FromQuery] int limit = 20, [FromQuery] int offset = 0)
@@ -117,8 +107,25 @@ namespace Conduit.Controllers
             var currentUser = _usersService.FindByEmail(currentUserEmail);
 
             var articles = _articleService.FeedArticles(currentUser, limit, offset);
-            return Ok(articles);
+            var articlesListResponse = BuildResponse(articles);
+            return Ok(articlesListResponse);
         }
+        [NonAction]
+        public ListArticleResponse BuildResponse(List<Article> articles)
+        {
+            ListArticleResponse response = new();
+            List<ArticleResponseDto> articlesList = new();
+            foreach (var article in articles)
+            {
+                var mappedArticle = _mapper.Map<ArticleResponseDto>(article);
+                mappedArticle.Author = _mapper.Map<ProfileResponseDto>(article.User);
+                articlesList.Add(mappedArticle);
+            }
+            response.Articles = articlesList;
+            response.ArticlesCount = articlesList.Count;
+            return response;
+        }
+
         [HttpPost("{slug}/favorite")]
         [Authorize]
         public IActionResult FavoriteArticle(string slug)

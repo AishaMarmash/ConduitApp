@@ -19,14 +19,14 @@ namespace Conduit.Services
             _mapper = mapper;
             _jwtService = jwtService;   
         }
-        public void Add(User user)
+        public void RegisterUser(User user)
         {
-            _userRepository.Add(user);
+            _userRepository.RegisterUser(user);
         }
 
-        public User? FindUser(User user)
+        public User? LoginUser(User user)
         {
-            return _userRepository.FindUser(user);
+            return _userRepository.LoginUser(user);
         }
 
         public User? FindByEmail(string email)
@@ -42,9 +42,9 @@ namespace Conduit.Services
             _userRepository.UpdateUser(updateduser);
         }
 
-        public bool UserExist(string email)
+        public bool UserExist(string? email = null, string? username = null)
         {
-            return _userRepository.UserExist(email);
+            return _userRepository.UserExist(email, username);
         }
 
         public UserResponse PrepareUserResponse(User user, string token)

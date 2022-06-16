@@ -25,10 +25,14 @@ namespace Conduit.Controllers
         {
             if (_userService.UserExist(registerModel.User.Email))
             {
-                return Conflict("user already exist");
+                return Conflict("email has already been taken");
+            }
+            if (_userService.UserExist(null,registerModel.User.Username))
+            {
+                return Conflict("username has already been taken");
             }
             User user = _mapper.Map<User>(registerModel.User);
-            _userService.Add(user);
+            _userService.RegisterUser(user);
             
             var token = _jwtService.GenerateSecurityToken(registerModel.User.Email);
             var response = _userService.PrepareUserResponse(user, token);
@@ -43,7 +47,7 @@ namespace Conduit.Controllers
                 return NotFound("user is not exist");
             }
             var userFromRequest = _mapper.Map<User>(loginModel.User);
-            var userFromRepo = _userService.FindUser(userFromRequest);
+            var userFromRepo = _userService.LoginUser(userFromRequest);
             if (userFromRepo == null)
             {
                 return Forbid("Password is wrong");
