@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Conduit.Domain.Models
+namespace Conduit.Domain.Entities
 {
     public class Comment
     {
@@ -13,7 +13,6 @@ namespace Conduit.Domain.Models
         public DateTime UpdatedAt { get; set; }
         public string Body { get; set; }
         public User Author { get; set; }
-
-
+        public Article Article { get; set; }
     }
 }

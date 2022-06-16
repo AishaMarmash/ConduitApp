@@ -1,11 +1,5 @@
-﻿using Conduit.Domain.Models;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.IdentityModel;
+﻿using Microsoft.EntityFrameworkCore;
+using Conduit.Domain.Entities;
 
 namespace Conduit.Data
 {
@@ -24,19 +18,32 @@ namespace Conduit.Data
                 options.UseSqlServer(@"Data Source=DESKTOP-ICHCNJM\SQLEXPRESS;Initial Catalog = ConduitData;Integrated Security=True");
             }
         }
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder
+            .Entity<User>()
+            .HasMany(u => u.Articles)
+            .WithOne(u => u.User);
+            
+            builder
+            .Entity<User>()
+            .HasMany(u => u.FavoritedArticles)
+            .WithMany(u => u.FavoritesUsers)
+            .UsingEntity(j => j.ToTable("UsersFavoriteArticles"));
+
+            builder
+           .Entity<Article>()
+           .HasMany(u => u.Comments)
+           .WithOne(u => u.Article);
+
+            builder
+           .Entity<User>()
+           .HasMany(u => u.Comments)
+           .WithOne(u => u.Author);
+        }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Article> Articles { get; set; }
-
-
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            /*base.OnModelCreating(builder);
-            builder.Entity<User>()
-            .HasOne<Profile>(p=>p.Id)
-            .WithOne(u => u.User)
-            .HasForeignKey(p => p.CategoryId);*/
-
-        }
+        public DbSet<Comment> Comments { get; set; }
     }
 }

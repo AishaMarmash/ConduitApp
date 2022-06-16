@@ -24,7 +24,7 @@ namespace Conduit.Data.Migrations
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Favorited = table.Column<bool>(type: "bit", nullable: false),
                     FavoritesCount = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -33,7 +33,8 @@ namespace Conduit.Data.Migrations
                         name: "FK_Articles_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

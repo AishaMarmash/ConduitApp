@@ -1,16 +1,23 @@
 ﻿using AutoMapper;
-using Conduit.Domain.Models;
+using Conduit.Domain.Entities;
+using Conduit.Domain.ViewModels;
+using Conduit.Domain.ViewModels.RequestBody;
 
 namespace Conduit.Profiles
 {
-    public class UserProfile:Profile
+    public class UserProfile : Profile
     {
         public UserProfile()
         {
-            CreateMap<User, UserForResponse>();
-            CreateMap<User, UserForUpdateDto>();
-            CreateMap<UserForUpdateDto, User>();
-            CreateMap<User, ProfileForResponse>();
+            CreateMap<LoginUserDto, User>();
+            CreateMap<RegisterUserDto, User>();
+            CreateMap<User, UserResponseDto>();
+            CreateMap<User, UpdateUserDto>();
+            CreateMap<UpdateUserDto, User>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<User, ProfileResponseDto>();
+            CreateMap<User, User>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }

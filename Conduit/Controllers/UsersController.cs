@@ -1,106 +1,63 @@
-﻿using Conduit.Data;
-using Conduit.Data.Repositories;
-using Conduit.Domain.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Conduit.Services;
-using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
-using Microsoft.Extensions.Primitives;
-using System.IdentityModel.Tokens.Jwt;
+using Conduit.Domain.Entities;
+using Conduit.Domain.Services;
+using Conduit.Domain.ViewModels.RequestBody;
 
 namespace Conduit.Controllers
 {
-    [Route("api/Users")]
+    [Route("api/users")]
     [ApiController]
     public class UsersController : Controller
     {
-        Data.AppContext userContext;
-        private IConfiguration _config;
-        UserRepository userRepo;
+        private readonly IUsersService _userService;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UsersController(IConfiguration config, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public UsersController(IUsersService userService, IMapper mapper, IJwtService jwtService)
         {
-            userContext = new();
-            _config = config;
-            userRepo = new UserRepository(userContext);
-            _config = config;
+            _userService = userService;
             _mapper = mapper;
-            _httpContextAccessor = httpContextAccessor;
+            _jwtService = jwtService;
         }
         [HttpPost]
-        public IActionResult Index([FromBody] RegisterModel registerModel)
+        public IActionResult Register([FromBody] RegisterModel registerModel)
         {
-            if (registerModel.Username.Length == 0)
+            if (_userService.UserExist(registerModel.User.Email))
             {
-                throw new Exception("Username Field is required");
+                return Conflict("email has already been taken");
             }
-            if (registerModel.email.Length == 0)
+            if (_userService.UserExist(null,registerModel.User.Username))
             {
-                throw new Exception("Email Field is required");
+                return Conflict("username has already been taken");
             }
-            if (registerModel.Password.Length == 0)
-            {
-                throw new Exception("Password Field is required");
-            }
-            if (userRepo.UserExist(registerModel.email))
-            {
-                throw new Exception("user is exist");
-            }
-            var user = new User()
-            {
-                Username = registerModel.Username,
-                Password = registerModel.Password,
-                Email = registerModel.email
-            };
-            userRepo.Add(user);
-            var userResponse = _mapper.Map<UserForResponse>(user);
-            var token = GetToken(user.Email);
-            userResponse.Token = token;
-            return Ok(userResponse);
-        }
-        [HttpPost("login")]
-        public ActionResult<UserForResponse> login([FromBody] LoginModel loginModel)
-        {
-            if (loginModel.Email.Length == 0)
-            {
-                throw new Exception("Email Field is required");
-            }
-            if (loginModel.Password.Length == 0)
-            {
-                throw new Exception("Password Field is required");
-            }
-            if (!userRepo.UserExist(loginModel.Email))
-            {
-                throw new Exception("user is not exist");
-            }
-            User user = new User()
-            {
-                Email = loginModel.Email,
-                Password = loginModel.Password
-            };
-            var result = userRepo.Find(user);
-            if (result == null)
-            {
-                throw new Exception("Password is uncorrect");
-            }
+            User user = _mapper.Map<User>(registerModel.User);
+            _userService.RegisterUser(user);
             
+            var token = _jwtService.GenerateSecurityToken(registerModel.User.Email);
+            var response = _userService.PrepareUserResponse(user, token);
+            return Ok(response);
+        }
+
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] LoginModel loginModel)
+        {
+            if (!_userService.UserExist(loginModel.User.Email))
+            {
+                return NotFound("user is not exist");
+            }
+            var userFromRequest = _mapper.Map<User>(loginModel.User);
+            var userFromRepo = _userService.LoginUser(userFromRequest);
+            if (userFromRepo == null)
+            {
+                return Forbid("Password is wrong");
+            }
             else
             {
-                UserForResponse userResponse = _mapper.Map<UserForResponse>(result);
-                var token = GetToken(user.Email);
-                userResponse.Token = token;
-                return Ok(userResponse);
+                var token = _jwtService.GenerateSecurityToken(loginModel.User.Email);
+                var response = _userService.PrepareUserResponse(userFromRepo, token);
+                return Ok(response);
             }
-        }
-        [NonAction]
-        public string GetToken(string email)
-        {
-            var jwt = new JwtService(_config);
-            var token = jwt.GenerateSecurityToken(email);
-            return token;
         }
     }
 }
