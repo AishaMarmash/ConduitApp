@@ -1,6 +1,5 @@
 ﻿using Conduit.Domain.Entities;
 using Conduit.Domain.Repositories;
-using Conduit.Domain.ViewModels;
 
 namespace Conduit.Data.Repositories
 {
@@ -22,7 +21,7 @@ namespace Conduit.Data.Repositories
             var result  = _context.Users.FirstOrDefault(m=>(m.Email == user.Email) && (m.Password == user.Password));
             return result;
         }
-        public User? FindByEmail(string email)
+        public User? GetUserByEmail(string email)
         {
             var result = _context.Users.FirstOrDefault(m => (m.Email == email));
             return result;
@@ -40,7 +39,7 @@ namespace Conduit.Data.Repositories
             else
                 return true;
         }
-        public void UpdateUser(User updateduser)
+        public void SaveChanges()
         {
             _context.SaveChanges();
         }

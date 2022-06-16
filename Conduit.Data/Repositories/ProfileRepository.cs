@@ -11,7 +11,6 @@ namespace Conduit.Data.Repositories
         {
             _context = context;
         }
-
         public User? GetProfile(string username)
         {
             var result = _context.Users.FirstOrDefault(m => (m.Username == username));
@@ -27,7 +26,7 @@ namespace Conduit.Data.Repositories
             _context.Users.Include(u=>u.Followings).First(u => u.Id == userFollwer.Id).Followings.Remove(followingUser);
             _context.SaveChanges();
         }
-        public bool FollowingStatus(User userFollwer, User followingUser)
+        public bool GetFollowingStatus(User userFollwer, User followingUser)
         {
             bool followingStatus = _context.Users.Include(u => u.Followings).First(u => u.Id == userFollwer.Id).Followings.Any(f => f.Id == followingUser.Id);
             return followingStatus;

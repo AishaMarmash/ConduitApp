@@ -104,7 +104,7 @@ namespace Conduit.Controllers
         public ActionResult FeedArticles([FromQuery] int limit = 20, [FromQuery] int offset = 0)
         {
             var currentUserEmail = _usersService.GetCurrentUserEmail();
-            var currentUser = _usersService.FindByEmail(currentUserEmail);
+            var currentUser = _usersService.GetUserByEmail(currentUserEmail);
 
             var articles = _articleService.FeedArticles(currentUser, limit, offset);
             var articlesListResponse = BuildResponse(articles);
@@ -131,7 +131,7 @@ namespace Conduit.Controllers
         public IActionResult FavoriteArticle(string slug)
         {
             var currentUserEmail = _usersService.GetCurrentUserEmail();
-            var currentUser = _usersService.FindByEmail(currentUserEmail);
+            var currentUser = _usersService.GetUserByEmail(currentUserEmail);
             var favoritedArticle = _articleService.Find(slug);
             _articleService.FavoriteArticle(currentUser, favoritedArticle);
             return Ok(favoritedArticle);
@@ -141,7 +141,7 @@ namespace Conduit.Controllers
         public IActionResult UnFavoriteArticle(string slug)
         {
             var currentUserEmail = _usersService.GetCurrentUserEmail();
-            var currentUser = _usersService.FindByEmail(currentUserEmail);
+            var currentUser = _usersService.GetUserByEmail(currentUserEmail);
             var unFavoritedArticle = _articleService.Find(slug);
             _articleService.UnFavoriteArticle(currentUser, unFavoritedArticle);
             return Ok(unFavoritedArticle);
@@ -151,7 +151,7 @@ namespace Conduit.Controllers
         public IActionResult AddComment(string slug, [FromBody] CommentModel recievedModel)
         {
             var currentUserEmail = _usersService.GetCurrentUserEmail();
-            var currentUser = _usersService.FindByEmail(currentUserEmail);
+            var currentUser = _usersService.GetUserByEmail(currentUserEmail);
             var comment = recievedModel.Comment;
             var comentToSend = _mapper.Map<Comment>(comment);
             comentToSend.CreatedAt = comentToSend.UpdatedAt = DateTime.UtcNow;
