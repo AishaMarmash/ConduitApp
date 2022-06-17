@@ -3,6 +3,7 @@ using AutoMapper;
 using Conduit.Domain.Entities;
 using Conduit.Domain.Services;
 using Conduit.Domain.ViewModels.RequestBody;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Conduit.Controllers
 {
@@ -13,14 +14,16 @@ namespace Conduit.Controllers
         private readonly IUsersService _userService;
         private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
-
-        public UsersController(IUsersService userService, IMapper mapper, IJwtService jwtService)
+        private readonly ITokenManager _tokenManager;
+        public UsersController(IUsersService userService, IMapper mapper, IJwtService jwtService, ITokenManager tokenManager)
         {
             _userService = userService;
             _mapper = mapper;
             _jwtService = jwtService;
+            _tokenManager = tokenManager;
         }
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult Register([FromBody] RegisterModel registerModel)
         {
             if (_userService.UserExist(registerModel.User.Email))
@@ -39,6 +42,7 @@ namespace Conduit.Controllers
             return Ok(response);
         }
         [HttpPost("login")]
+        [AllowAnonymous]
         public IActionResult Login([FromBody] LoginModel loginModel)
         {
             if (!_userService.UserExist(loginModel.User.Email))
@@ -57,6 +61,13 @@ namespace Conduit.Controllers
                 var response = _userService.PrepareUserResponse(userFromRepo, token);
                 return Ok(response);
             }
+        }
+        [HttpPost("tokens/cancel")]
+        public async Task<IActionResult> CancelAccessToken()
+        {
+            await _tokenManager.DeactivateCurrentAsync();
+
+            return NoContent();
         }
     }
 }

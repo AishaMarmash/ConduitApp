@@ -16,6 +16,7 @@ namespace Conduit.Middlewares
                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("PDv7DrqznYL6nv7DrqzjnQYO9JxIsWdcjnQYL6nu0f")),
                    ValidateIssuer = false,
                    ValidateAudience = false,
+                   ValidateLifetime = true
                };
            });
             return services;

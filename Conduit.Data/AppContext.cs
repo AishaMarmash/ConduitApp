@@ -5,12 +5,8 @@ namespace Conduit.Data
 {
     public class AppContext : DbContext
     {
-        public AppContext()
-        { }
-        public AppContext(DbContextOptions options) : base(options)
-        {
-            
-        }
+        public AppContext(){ }
+        public AppContext(DbContextOptions options) : base(options){ }
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             if (!options.IsConfigured)
@@ -41,7 +37,6 @@ namespace Conduit.Data
            .HasMany(u => u.Comments)
            .WithOne(u => u.Author);
         }
-
         public DbSet<User> Users { get; set; }
         public DbSet<Article> Articles { get; set; }
         public DbSet<Comment> Comments { get; set; }
