@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Conduit.Domain.Entities;
 using Conduit.Domain.ViewModels;
-using Conduit.Domain.ViewModels.RequestBody;
 
 namespace Conduit.Profiles
 {

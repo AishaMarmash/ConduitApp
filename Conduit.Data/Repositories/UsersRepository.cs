@@ -11,9 +11,9 @@ namespace Conduit.Data.Repositories
         {
             _context = context;
         }
-        public void RegisterUser(User user)
+        public async Task RegisterUser(User user)
         {
-            _context.Users.Add(user);
+            await _context.Users.AddAsync(user);
             _context.SaveChanges();
         }
         public User? LoginUser(User user)

@@ -41,12 +41,12 @@ namespace Conduit.Services
         {
             return _profileRepository.GetFollowingStatus(userFollwer,followingUser);
         }
-        public ProfileResponse ApplyFollowingStatus(ProfileResponse response)
+        public ProfileResponseDto ApplyFollowingStatus(ProfileResponseDto response)
         {
             var userEmail = _usersService.GetCurrentUserEmail();
             var currentUser = _usersService.GetUserByEmail(userEmail);
-            var otherUser = _usersService.GetUserByName(response.Profile.Username);
-            response.Profile.Following = GetFollowingStatus(currentUser, otherUser);
+            var otherUser = _usersService.GetUserByName(response.Username);
+            response.Following = GetFollowingStatus(currentUser, otherUser);
             return response;
         }
         public ProfileResponse GetFollowingActivityResponse(User currentUser, User neededUser)

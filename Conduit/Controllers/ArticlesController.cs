@@ -2,11 +2,8 @@
 using Conduit.Domain.Entities;
 using Conduit.Domain.Services;
 using Conduit.Domain.ViewModels;
-using Conduit.Domain.ViewModels.RequestBody;
-using Conduit.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace Conduit.Controllers
 {
@@ -15,89 +12,104 @@ namespace Conduit.Controllers
     public class ArticlesController : Controller
     {
         private readonly IArticleService _articleService;
-        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
-        IUsersService _usersService;
+        private readonly IUsersService _usersService;
 
-        public ArticlesController(IArticleService articleService, IMapper mapper, IJwtService jwtService, IUsersService usersService)
+        public ArticlesController(IArticleService articleService, IMapper mapper,IUsersService usersService)
         {
             _articleService = articleService;
             _mapper = mapper;
-            _jwtService = jwtService;
             _usersService = usersService;
         }
-
         [Authorize]
         [HttpPost]
         public ActionResult CreateArticle([FromBody] CreateArticleModel recievedModel)
         {
             CreateArticleDto recievedArticle = recievedModel.Article;
-            string authorEmail = _jwtService.GetEmailClaim();
+            string authorEmail = _usersService.GetCurrentUserEmail();
             var newArticle = _articleService.PrepareArticleToSave(recievedArticle);
-            Article a = _articleService.Add(newArticle, authorEmail);
-            var response = _articleService.PrepareArticleResponse(a);
+            Article addedArticle = _articleService.AddArticle(newArticle, authorEmail);
+            var response = _articleService.BuildResponse(addedArticle);
             return Ok(response);
         }
-
         [Authorize]
         [HttpPut("{slug}")]
         public ActionResult UpdateArticle(string slug, [FromBody] UpdateArticleModel recievedModel)
         {
-            var articleFromRepo = _articleService.Find(slug);
+            var articleFromRepo = _articleService.FindArticle(slug);
             UpdateArticleDto recievedArticle = recievedModel.Article;
-            _mapper.Map(recievedArticle, articleFromRepo);
-            string userEmail = _jwtService.GetEmailClaim();
+            var updatedArticle = _mapper.Map(recievedArticle, articleFromRepo);
+            string userEmail = _usersService.GetCurrentUserEmail();
             if (articleFromRepo.User.Email == userEmail)
             {
-                _articleService.Update(articleFromRepo, userEmail);
+                _articleService.UpdateArticle(articleFromRepo, userEmail);
             }
-            ArticleResponse response = new();
-            response.Article = _mapper.Map<ArticleResponseDto>(articleFromRepo);
+            else
+            {
+                return Unauthorized();
+            }
+            var response = _articleService.BuildResponse(updatedArticle);
             return Ok(response);
-        }
-        [HttpGet("{slug}")]
-        public ActionResult ReadArticle(string slug)
-        {
-            var article = _articleService.Find(slug);
-            var newArticle = _articleService.PrepareArticleResponse(article);
-            return Ok(newArticle);
         }
         [Authorize]
         [HttpDelete("{slug}")]
         public ActionResult DeleteArticle(string slug)
         {
-            string authorEmail = _jwtService.GetEmailClaim();
-            _articleService.Delete(slug, authorEmail);
-            return Ok();
+            string userEmail = _usersService.GetCurrentUserEmail();
+            var articleFromRepo = _articleService.FindArticle(slug);
+            if(userEmail == articleFromRepo.User.Email)
+            {
+                if(articleFromRepo!=null)
+                {
+                    _articleService.DeleteArticle(slug, userEmail);
+                    return Ok();
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+                return Unauthorized();
         }
 
-        [HttpGet]
-        public ActionResult ListArticles([FromQuery] string? tag = null, [FromQuery] string? author = null, [FromQuery] string? favorited = null, [FromQuery] int limit = 20, [FromQuery] int offset = 0)
+        [HttpGet("{slug}")]
+        public ActionResult ReadArticle(string slug)
         {
-            if (tag != null)
+            var article = _articleService.FindArticle(slug);
+            if(article != null)
             {
-                var articles = _articleService.ListArticlesByTag(tag, limit, offset);
-                var articlesListResponse = BuildResponse(articles);
-                return Ok(articlesListResponse);
-            }
-            if (author != null)
-            {
-                var articles = _articleService.ListArticlesByAuthor(author, limit, offset);
-                var articlesListResponse = BuildResponse(articles);
-                return Ok(articlesListResponse);
-            }
-            if (favorited != null)
-            {
-                var articles = _articleService.ListArticlesByFavorited(favorited, limit, offset);
-                var articlesListResponse = BuildResponse(articles);
-                return Ok(articlesListResponse);
+                var response = _articleService.BuildResponse(article);
+                return Ok(response);
             }
             else
             {
-                var articles = _articleService.ListArticles(limit, offset);
-                var articlesListResponse = BuildResponse(articles);
-                return Ok(articlesListResponse);
+                return NotFound();
             }
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        public ActionResult ListArticles([FromQuery] string? tag = null, [FromQuery] string? author = null, [FromQuery] string? favorited = null, [FromQuery] int limit = 20, [FromQuery] int offset = 0)
+        {
+            List<Article> articles;
+            if (tag != null)
+            {
+                articles = _articleService.ListArticlesByTag(tag, limit, offset);
+            }
+            else if (author != null)
+            {
+                articles = _articleService.ListArticlesByAuthor(author, limit, offset);
+            }
+            else if (favorited != null)
+            {
+                articles = _articleService.ListArticlesByFavorited(favorited, limit, offset);
+            }
+            else
+            {
+                articles = _articleService.ListArticles(limit, offset);
+            }
+            var articlesListResponse = _articleService.BuildResponse(articles);
+            return Ok(articlesListResponse);
         }
         [HttpGet("feed")]
         [Authorize]
@@ -105,36 +117,34 @@ namespace Conduit.Controllers
         {
             var currentUserEmail = _usersService.GetCurrentUserEmail();
             var currentUser = _usersService.GetUserByEmail(currentUserEmail);
-
-            var articles = _articleService.FeedArticles(currentUser, limit, offset);
-            var articlesListResponse = BuildResponse(articles);
-            return Ok(articlesListResponse);
-        }
-        [NonAction]
-        public ListArticleResponse BuildResponse(List<Article> articles)
-        {
-            ListArticleResponse response = new();
-            List<ArticleResponseDto> articlesList = new();
-            foreach (var article in articles)
+            if(currentUser!=null)
             {
-                var mappedArticle = _mapper.Map<ArticleResponseDto>(article);
-                mappedArticle.Author = _mapper.Map<ProfileResponseDto>(article.User);
-                articlesList.Add(mappedArticle);
+                var articles = _articleService.FeedArticles(currentUser, limit, offset);
+                var articlesListResponse = _articleService.BuildResponse(articles);
+                return Ok(articlesListResponse);
             }
-            response.Articles = articlesList;
-            response.ArticlesCount = articlesList.Count;
-            return response;
+            else
+            {
+                return Unauthorized();
+            }
         }
-
         [HttpPost("{slug}/favorite")]
         [Authorize]
         public IActionResult FavoriteArticle(string slug)
         {
             var currentUserEmail = _usersService.GetCurrentUserEmail();
             var currentUser = _usersService.GetUserByEmail(currentUserEmail);
-            var favoritedArticle = _articleService.Find(slug);
-            _articleService.FavoriteArticle(currentUser, favoritedArticle);
-            return Ok(favoritedArticle);
+            var favoritedArticle = _articleService.FindArticle(slug);
+            if(favoritedArticle != null && currentUser != null)
+            {
+                _articleService.FavoriteArticle(currentUser, favoritedArticle);
+                var response = _articleService.BuildResponse(favoritedArticle);
+                return Ok(response);
+            }
+            else 
+            { 
+                return NotFound(); 
+            }
         }
         [HttpDelete("{slug}/favorite")]
         [Authorize]
@@ -142,35 +152,17 @@ namespace Conduit.Controllers
         {
             var currentUserEmail = _usersService.GetCurrentUserEmail();
             var currentUser = _usersService.GetUserByEmail(currentUserEmail);
-            var unFavoritedArticle = _articleService.Find(slug);
-            _articleService.UnFavoriteArticle(currentUser, unFavoritedArticle);
-            return Ok(unFavoritedArticle);
-        }
-        [HttpPost("{slug}/comments")]
-        [Authorize]
-        public IActionResult AddComment(string slug, [FromBody] CommentModel recievedModel)
-        {
-            var currentUserEmail = _usersService.GetCurrentUserEmail();
-            var currentUser = _usersService.GetUserByEmail(currentUserEmail);
-            var comment = recievedModel.Comment;
-            var comentToSend = _mapper.Map<Comment>(comment);
-            comentToSend.CreatedAt = comentToSend.UpdatedAt = DateTime.UtcNow;
-            var finalComment = _articleService.AddComment(slug, comentToSend, currentUser);
-            return Ok(finalComment);
-        }
-        [HttpGet("{slug}/comment")]
-        public IActionResult GetComment(string slug)
-        {
-            List<Comment> comments = _articleService.GetComments(slug);
-            return Ok(comments);
-        }
-        [HttpDelete("{slug}/comments/{id}")]
-        [Authorize]
-        public IActionResult DeleteComment(string slug,int id)
-        {
-            List<Comment> comments = _articleService.GetComments(slug);
-            _articleService.DeleteComment(comments.First(u => u.Id == id));
-            return Ok();
+            var unFavoritedArticle = _articleService.FindArticle(slug);
+            if(unFavoritedArticle != null && currentUser != null)
+            {
+                _articleService.UnFavoriteArticle(currentUser, unFavoritedArticle);
+                var response = _articleService.BuildResponse(unFavoritedArticle);
+                return Ok(response);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
     }
 }

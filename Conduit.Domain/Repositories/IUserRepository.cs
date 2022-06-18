@@ -5,7 +5,7 @@ namespace Conduit.Domain.Repositories
 {
     public interface IUserRepository
     {
-        public void RegisterUser(User user);
+        public Task RegisterUser(User user);
         public User? LoginUser(User user);
         public User? GetUserByEmail(string email);
         public User? FindByUsername(string username);

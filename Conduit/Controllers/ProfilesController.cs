@@ -30,7 +30,7 @@ namespace Conduit.Controllers
                 bool isAuthenticated = _usersService.CheckAuthentication();
                 if (isAuthenticated)
                 {
-                    response = _profileService.ApplyFollowingStatus(response);
+                    response.Profile = _profileService.ApplyFollowingStatus(response.Profile);
                 }
                 return Ok(response);
             }

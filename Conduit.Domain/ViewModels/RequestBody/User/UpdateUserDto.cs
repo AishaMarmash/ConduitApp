@@ -1,4 +1,4 @@
-﻿namespace Conduit.Domain.ViewModels.RequestBody
+﻿namespace Conduit.Domain.ViewModels
 {
     public class UpdateUserDto
     {

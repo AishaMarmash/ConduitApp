@@ -3,35 +3,40 @@ using Conduit.Domain.Entities;
 using Conduit.Domain.Repositories;
 using Conduit.Domain.Services;
 using Conduit.Domain.ViewModels;
-using Conduit.Domain.ViewModels.RequestBody;
 
 namespace Conduit.Services
 {
     public class ArticleService : IArticleService
     {
         private readonly IArticleRepository _articleRepository;
-        private IMapper _mapper;
-
-        public ArticleService(IArticleRepository articleRepository, IMapper mapper)
+        private readonly IMapper _mapper;
+        private readonly IUsersService _usersService;
+        private readonly IProfileService _profileService;
+        public ArticleService(IArticleRepository articleRepository,
+                                IMapper mapper,
+                                IUsersService usersService,
+                                IProfileService profileService)
         {
             _articleRepository = articleRepository;
             _mapper = mapper;
+            _usersService = usersService;
+            _profileService = profileService;
         }
-        public Article Add(Article article, string authorEmail)
+        public Article AddArticle(Article article, string authorEmail)
         {
-            return _articleRepository.Add(article, authorEmail);
+            return _articleRepository.AddArticle(article, authorEmail);
         }
-        public Article Find(string slug)
+        public Article FindArticle(string slug)
         {
-            return _articleRepository.Find(slug);
+            return _articleRepository.FindArticle(slug);
         }
-        public void Delete(string slug, string authorEmail)
+        public void DeleteArticle(string slug, string authorEmail)
         {
-            _articleRepository.Delete(slug,authorEmail);
+            _articleRepository.DeleteArticle(slug,authorEmail);
         }
-        public void Update(Article articleToSave, string authorEmail)
+        public void UpdateArticle(Article articleToSave, string authorEmail)
         {
-            _articleRepository.Update(articleToSave, authorEmail);
+            _articleRepository.UpdateArticle(articleToSave, authorEmail);
         }
         public List<Article> ListArticles(int limit, int offset)
         {
@@ -66,18 +71,6 @@ namespace Conduit.Services
         {
             _articleRepository.UnFavoriteArticle(currentUser, unFavoritedArticle);
         }
-        public Comment AddComment(string slug, Comment comment, User currentUser)
-        {
-            return _articleRepository.AddComment(slug, comment, currentUser);
-        }
-        public List<Comment> GetComments(string slug)
-        {
-            return _articleRepository.GetComments(slug);
-        }
-        public void DeleteComment(Comment comment)
-        {
-            _articleRepository.DeleteComment(comment);
-        }
         public List<string> GetTags()
         {
             return _articleRepository.GetTags();
@@ -93,12 +86,36 @@ namespace Conduit.Services
             newArticle.CreatedAt = newArticle.UpdatedAt = DateTime.Now;
             return newArticle;
         }
-        public ArticleResponse PrepareArticleResponse(Article newArticle)
+        public ArticleResponse BuildResponse(Article newArticle)
         {
             ArticleResponseDto article = _mapper.Map<ArticleResponseDto>(newArticle);
             _mapper.Map(newArticle.User, article.Author);
+            bool isAuthenticated = _usersService.CheckAuthentication();
+            if (isAuthenticated)
+            {
+                article.Author = _profileService.ApplyFollowingStatus(article.Author);
+            }
             ArticleResponse response = new();
             response.Article = article;
+            return response;
+        }
+        public ListArticleResponse BuildResponse(List<Article> articles)
+        {
+            ListArticleResponse response = new();
+            List<ArticleResponseDto> articlesList = new();
+            foreach (var article in articles)
+            {
+                var mappedArticle = _mapper.Map<ArticleResponseDto>(article);
+                mappedArticle.Author = _mapper.Map<ProfileResponseDto>(article.User);
+                bool isAuthenticated = _usersService.CheckAuthentication();
+                if (isAuthenticated)
+                {
+                    mappedArticle.Author = _profileService.ApplyFollowingStatus(mappedArticle.Author);
+                }
+                articlesList.Add(mappedArticle);
+            }
+            response.Articles = articlesList;
+            response.ArticlesCount = articlesList.Count;
             return response;
         }
     }

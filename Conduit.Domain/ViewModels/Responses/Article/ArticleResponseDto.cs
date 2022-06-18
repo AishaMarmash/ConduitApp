@@ -1,6 +1,4 @@
-﻿using Conduit.Domain.Entities;
-
-namespace Conduit.Domain.ViewModels
+﻿namespace Conduit.Domain.ViewModels
 {
     public class ArticleResponseDto
     {
