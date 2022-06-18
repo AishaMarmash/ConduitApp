@@ -1,12 +1,11 @@
-﻿namespace Conduit.Domain.Entities
+﻿namespace Conduit.Domain.ViewModels
 {
-    public class Comment
+    public class CommentResponseDto
     {
         public int Id { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public string Body { get; set; }
-        public User Author { get; set; }
-        public Article Article { get; set; }
+        public ProfileResponseDto Author { get; set; } = new ProfileResponseDto();
     }
 }

@@ -4,7 +4,7 @@ namespace Conduit.Domain.Services
 {
     public interface IUsersService
     {
-        public void RegisterUser(User user);
+        public Task RegisterUser(User user);
         public User? LoginUser(User user);
         public User? GetUserByEmail(string email);
         public User? GetUserByName(string username);

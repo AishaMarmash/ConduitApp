@@ -1,14 +1,12 @@
 ﻿using Conduit.Domain.Entities;
 using Conduit.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace Conduit.Data.Repositories
 {
     public class ProfileRepository : IProfileRepository
     {
         protected readonly AppContext _context;
-        public MemoryCache memoryCache;
         public ProfileRepository(AppContext context)
         {
             _context = context;

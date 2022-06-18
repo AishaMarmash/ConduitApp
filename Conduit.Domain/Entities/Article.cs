@@ -1,12 +1,4 @@
-﻿using Conduit.Domain.Services;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Conduit.Domain.Entities
+﻿namespace Conduit.Domain.Entities
 {
     public class Article
     {

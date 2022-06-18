@@ -1,4 +1,3 @@
-using Conduit.Data;
 using Microsoft.EntityFrameworkCore;
 using Conduit.Middlewares;
 using Conduit.Data.Repositories;
@@ -21,6 +20,8 @@ builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IArticleService, ArticleService>();
 builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
 builder.Services.AddTransient<ITokenManager, TokenManager>();
 builder.Services.AddStackExchangeRedisCache(options =>
 {

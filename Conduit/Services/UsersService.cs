@@ -19,9 +19,9 @@ namespace Conduit.Services
             _mapper = mapper;
             _jwtService = jwtService;   
         }
-        public void RegisterUser(User user)
+        public async Task RegisterUser(User user)
         {
-            _userRepository.RegisterUser(user);
+            await _userRepository.RegisterUser(user);
         }
         public User? LoginUser(User user)
         {

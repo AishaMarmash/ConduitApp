@@ -6,7 +6,7 @@ namespace Conduit.Controllers
 {
     [ApiController]
     [Route("api/tags")]
-    public class TagsController:Controller
+    public class TagsController : Controller
     {
         private readonly IArticleService _articleService;
 

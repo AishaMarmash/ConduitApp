@@ -1,6 +1,5 @@
 ﻿using Conduit.Domain.Services;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 
 namespace Conduit.Services
@@ -9,9 +8,8 @@ namespace Conduit.Services
     {
         private readonly IDistributedCache _cache;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IOptions<JwtOptions> _jwtOptions;
-        private IConfiguration _config;
-        string _expDate;
+        private readonly IConfiguration _config;
+        private readonly string _expDate;
 
         public TokenManager(IDistributedCache cache,IHttpContextAccessor httpContextAccessor,IConfiguration configuration)
         {

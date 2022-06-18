@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Conduit.Services
 {
-    public static class StringExtensions
+    public static class Helpers
     {
         public static string Combine(this List<string> tagsList)
         {

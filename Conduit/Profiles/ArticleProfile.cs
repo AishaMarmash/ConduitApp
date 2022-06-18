@@ -13,7 +13,7 @@ namespace Conduit.Profiles
                 .ForMember(dest => dest.CreatedAt,
                  opt => opt.MapFrom(src => DateTime.Now))
                 .ForMember(dest => dest.UpdatedAt,
-                 opt => opt.MapFrom(src => DateTime.Now));
+                 opt => opt.MapFrom(src => DateTime.Now)); ;
             
             CreateMap<UpdateArticleDto, Article>()
                  .ForMember(
@@ -35,7 +35,6 @@ namespace Conduit.Profiles
                  dest => dest.TagList,
                  opt => opt.MapFrom(src => (!String.IsNullOrEmpty(src.TagList)) ?(src.TagList.MoveToList()): null));
             CreateMap<CreateArticleDto, Article>();
-
 
         }
     }

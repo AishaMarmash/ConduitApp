@@ -9,7 +9,7 @@ namespace Conduit.Domain.Services
         public void UnFollowUser(User userFollwer, User followingUser);
         public ProfileResponse PrepareProfileResponse(User user);
         public bool GetFollowingStatus(User userFollwer, User followingUser);
-        public ProfileResponse ApplyFollowingStatus(ProfileResponse response);
+        public ProfileResponseDto ApplyFollowingStatus(ProfileResponseDto response);
         public ProfileResponse GetFollowingActivityResponse(User currentUser, User neededUser);
     }
 }

@@ -2,7 +2,7 @@
 using AutoMapper;
 using Conduit.Domain.Entities;
 using Conduit.Domain.Services;
-using Conduit.Domain.ViewModels.RequestBody;
+using Conduit.Domain.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Conduit.Controllers
@@ -24,7 +24,7 @@ namespace Conduit.Controllers
         }
         [HttpPost]
         [AllowAnonymous]
-        public IActionResult Register([FromBody] RegisterModel registerModel)
+        public async Task<IActionResult> Register([FromBody] RegisterModel registerModel)
         {
             if (_userService.UserExist(registerModel.User.Email))
             {
@@ -35,7 +35,7 @@ namespace Conduit.Controllers
                 return Conflict("username has already been taken");
             }
             User user = _mapper.Map<User>(registerModel.User);
-            _userService.RegisterUser(user);
+            await _userService.RegisterUser(user);
             
             var token = _jwtService.GenerateSecurityToken(registerModel.User.Email);
             var response = _userService.PrepareUserResponse(user, token);
@@ -62,12 +62,11 @@ namespace Conduit.Controllers
                 return Ok(response);
             }
         }
-        [HttpPost("tokens/cancel")]
+        [HttpPost("logout")]
         public async Task<IActionResult> CancelAccessToken()
         {
             await _tokenManager.DeactivateCurrentAsync();
-
-            return NoContent();
+            return Ok();
         }
     }
 }
